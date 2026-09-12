@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>SkyQuest — Chapter 7: Air, Water and Weather</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky-deep:#101B33;
+  --sky-mid:#1E3358;
+  --sky-panel:#25406B;
+  --sun:#FFB13D;
+  --sun-deep:#F08A24;
+  --teal:#2FBFAE;
+  --rain:#4FA3D8;
+  --coral:#FF6F59;
+  --mist:#EAF2FB;
+  --mist-dim:#B9C8DE;
+  --ink:#0C1526;
+  --good:#3CCB7F;
+  --bad:#FF6F59;
+  --radius-lg:22px;
+  --radius-md:14px;
+  --radius-sm:9px;
+  --font-head:'Baloo 2', system-ui, sans-serif;
+  --font-body:'Manrope', system-ui, sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--font-body);
+  background:
+    radial-gradient(ellipse 900px 500px at 15% -5%, #2A4A7C 0%, transparent 60%),
+    radial-gradient(ellipse 700px 500px at 100% 0%, #1A5C63 0%, transparent 55%),
+    linear-gradient(180deg, var(--sky-deep) 0%, #0B1428 100%);
+  color:var(--mist);
+  min-height:100vh;
+  -webkit-tap-highlight-color:transparent;
+}
+#app{
+  max-width:520px;
+  margin:0 auto;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  position:relative;
+  padding-bottom:78px;
+}
+
+/* ===== Top bar ===== */
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 16px 10px;
+  position:sticky;
+  top:0;
+  z-index:30;
+  background:linear-gradient(180deg, rgba(16,27,51,0.97) 70%, rgba(16,27,51,0));
+  backdrop-filter:blur(2px);
+}
+.brand{display:flex;align-items:center;gap:9px;}
+.brand-badge{
+  width:36px;height:36px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #fff, var(--mist) 40%, var(--rain) 100%);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 0 2px rgba(255,255,255,0.15), 0 3px 10px rgba(0,0,0,0.3);
+}
+.brand-title{font-family:var(--font-head);font-weight:700;font-size:16.5px;letter-spacing:0.2px;color:var(--mist);line-height:1.1;}
+.brand-sub{font-size:10px;color:var(--mist-dim);font-weight:600;letter-spacing:0.5px;}
+.stats{display:flex;align-items:center;gap:10px;}
+.stat-chip{
+  display:flex;align-items:center;gap:4px;
+  background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.09);
+  padding:5px 9px;border-radius:999px;
+  font-weight:800;font-size:13px;font-family:var(--font-head);
+}
+.stat-chip svg{width:16px;height:16px;flex-shrink:0;}
+.stat-xp{color:var(--sun);}
+.stat-streak{color:#FF9E5E;}
+.stat-heart{color:var(--coral);}
+
+/* ===== Tabs ===== */
+.tabbar{
+  position:fixed;
+  bottom:0;left:0;right:0;
+  max-width:520px;margin:0 auto;
+  background:rgba(15,24,45,0.96);
+  border-top:1px solid rgba(255,255,255,0.08);
+  display:flex;
+  z-index:40;
+  backdrop-filter:blur(6px);
+}
+.tab-btn{
+  flex:1;border:none;background:none;color:var(--mist-dim);
+  font-family:var(--font-body);font-weight:700;font-size:10.5px;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:9px 2px 10px;cursor:pointer;transition:color .15s;
+}
+.tab-btn svg{width:21px;height:21px;}
+.tab-btn.active{color:var(--sun);}
+.tab-btn.active svg{filter:drop-shadow(0 0 6px rgba(255,177,61,0.5));}
+
+.screen{display:none;padding:6px 16px 20px;animation:fadein .25s ease;}
+.screen.active{display:block;}
+@keyframes fadein{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+/* ===== Journey path ===== */
+.journey-head{padding:6px 2px 18px;}
+.journey-head h1{font-family:var(--font-head);font-size:21px;margin:0 0 4px;color:var(--mist);}
+.journey-head p{margin:0;color:var(--mist-dim);font-size:13.5px;line-height:1.5;}
+
+.path{position:relative;padding:10px 0 30px;}
+.path::before{
+  content:'';position:absolute;left:50%;top:0;bottom:0;width:3px;
+  background:repeating-linear-gradient(180deg, rgba(255,255,255,0.14) 0 8px, transparent 8px 16px);
+  transform:translateX(-50%);
+}
+.node-row{display:flex;justify-content:center;margin:0;position:relative;z-index:2;}
+.node-row.left .node-wrap{margin-right:auto;margin-left:8%;}
+.node-row.right .node-wrap{margin-left:auto;margin-right:8%;}
+.node-row.center .node-wrap{margin:0 auto;}
+.node-wrap{display:flex;flex-direction:column;align-items:center;width:118px;padding:16px 0;}
+.node{
+  width:74px;height:74px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:30px;
+  border:3px solid rgba(255,255,255,0.18);
+  cursor:pointer;position:relative;
+  transition:transform .15s;
+}
+.node:active{transform:scale(0.94);}
+.node.locked{filter:grayscale(0.6) brightness(0.55);cursor:default;}
+.node-ring{position:absolute;inset:-6px;border-radius:50%;border:2px dashed rgba(255,255,255,0.0);}
+.node.complete{box-shadow:0 0 0 4px rgba(60,203,127,0.25);}
+.node-stars{display:flex;gap:2px;margin-top:6px;}
+.node-stars svg{width:12px;height:12px;}
+.node-label{
+  margin-top:8px;font-family:var(--font-head);font-weight:700;font-size:12.5px;
+  text-align:center;color:var(--mist);line-height:1.25;
+}
+.node-sub{font-size:10px;color:var(--mist-dim);text-align:center;margin-top:1px;}
+
+.boss-node{width:88px;height:88px;font-size:36px;}
+
+/* ===== Cards / panels ===== */
+.panel{
+  background:linear-gradient(160deg, var(--sky-panel), var(--sky-mid));
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:var(--radius-lg);
+  padding:18px;
+  margin-bottom:14px;
+}
+.panel h2{font-family:var(--font-head);font-size:17px;margin:0 0 8px;color:var(--mist);}
+.panel h3{font-family:var(--font-head);font-size:14.5px;margin:14px 0 6px;color:var(--sun);}
+.panel p{font-size:13.5px;line-height:1.6;color:#DCE6F5;margin:0 0 8px;}
+.panel ul{margin:6px 0;padding-left:20px;font-size:13.5px;line-height:1.6;color:#DCE6F5;}
+.pill-row{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0;}
+.pill{background:rgba(255,255,255,0.08);border-radius:999px;padding:4px 10px;font-size:11.5px;font-weight:700;color:var(--mist);}
+
+/* ===== Modal ===== */
+.overlay{
+  position:fixed;inset:0;background:rgba(6,10,20,0.72);
+  display:none;align-items:flex-end;justify-content:center;z-index:100;
+  backdrop-filter:blur(2px);
+}
+.overlay.show{display:flex;}
+.sheet{
+  width:100%;max-width:520px;max-height:88vh;overflow-y:auto;
+  background:linear-gradient(180deg, #1B2C4E, #101B33);
+  border-radius:26px 26px 0 0;
+  padding:22px 20px 30px;
+  animation:slideup .25s ease;
+  border-top:1px solid rgba(255,255,255,0.12);
+}
+@keyframes slideup{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.sheet-handle{width:38px;height:4px;border-radius:4px;background:rgba(255,255,255,0.2);margin:0 auto 16px;}
+.sheet-close{
+  position:absolute;top:16px;right:18px;background:rgba(255,255,255,0.08);
+  border:none;color:var(--mist);width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;
+}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  font-family:var(--font-head);font-weight:700;font-size:15px;
+  padding:13px 20px;border-radius:14px;border:none;cursor:pointer;width:100%;
+  transition:transform .1s, filter .15s;
+}
+.btn:active{transform:scale(0.97);}
+.btn-primary{background:linear-gradient(135deg, var(--sun), var(--sun-deep));color:#2B1600;box-shadow:0 4px 14px rgba(240,138,36,0.35);}
+.btn-teal{background:linear-gradient(135deg, #3ED1BE, var(--teal));color:#023A34;box-shadow:0 4px 14px rgba(47,191,174,0.3);}
+.btn-ghost{background:rgba(255,255,255,0.08);color:var(--mist);}
+.btn:disabled{opacity:0.45;cursor:default;}
+
+/* ===== Quiz ===== */
+.quiz-progress{display:flex;gap:5px;margin-bottom:16px;}
+.quiz-progress div{flex:1;height:6px;border-radius:4px;background:rgba(255,255,255,0.12);}
+.quiz-progress div.done{background:var(--good);}
+.quiz-progress div.current{background:var(--sun);}
+.q-type-tag{font-size:10.5px;font-weight:800;letter-spacing:0.4px;color:var(--teal);margin-bottom:6px;}
+.q-text{font-family:var(--font-head);font-size:18px;line-height:1.4;color:var(--mist);margin:0 0 16px;}
+.opt{
+  display:block;width:100%;text-align:left;background:rgba(255,255,255,0.06);
+  border:2px solid rgba(255,255,255,0.1);color:var(--mist);
+  border-radius:13px;padding:13px 15px;margin-bottom:10px;font-size:14.5px;font-weight:600;
+  cursor:pointer;font-family:var(--font-body);transition:all .12s;
+}
+.opt:active{transform:scale(0.98);}
+.opt.correct{background:rgba(60,203,127,0.18);border-color:var(--good);color:#B9F5D0;}
+.opt.wrong{background:rgba(255,111,89,0.18);border-color:var(--bad);color:#FFC9BF;}
+.opt.dim{opacity:0.45;}
+.fill-input{
+  width:100%;padding:14px;border-radius:13px;border:2px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.06);color:var(--mist);font-size:16px;font-family:var(--font-body);font-weight:600;
+  margin-bottom:14px;
+}
+.fill-input:focus{outline:none;border-color:var(--teal);}
+.feedback-box{
+  border-radius:14px;padding:14px 15px;margin:4px 0 16px;font-size:13.5px;line-height:1.55;
+}
+.feedback-box.good{background:rgba(60,203,127,0.14);border:1px solid rgba(60,203,127,0.35);color:#CFF7DF;}
+.feedback-box.bad{background:rgba(255,111,89,0.14);border:1px solid rgba(255,111,89,0.35);color:#FFDBD3;}
+.feedback-box b{color:#fff;}
+
+/* ===== Result screen ===== */
+.result-center{text-align:center;padding:10px 6px 4px;}
+.result-emoji{font-size:56px;margin-bottom:6px;}
+.result-title{font-family:var(--font-head);font-size:22px;color:var(--mist);margin:0 0 4px;}
+.result-sub{color:var(--mist-dim);font-size:13.5px;margin-bottom:18px;}
+.result-stats{display:flex;justify-content:center;gap:22px;margin-bottom:22px;}
+.result-stat b{display:block;font-family:var(--font-head);font-size:20px;color:var(--sun);}
+.result-stat span{font-size:11px;color:var(--mist-dim);}
+
+/* ===== Explore ===== */
+.explore-card{background:rgba(255,255,255,0.04);border-radius:var(--radius-md);padding:14px;margin-bottom:12px;border:1px solid rgba(255,255,255,0.06);}
+.svg-wrap{width:100%;background:rgba(0,0,0,0.15);border-radius:12px;padding:8px;margin:8px 0;}
+.svg-wrap svg{width:100%;height:auto;display:block;}
+.trivia{
+  background:linear-gradient(135deg, rgba(255,177,61,0.13), rgba(255,177,61,0.03));
+  border:1px solid rgba(255,177,61,0.3);border-radius:13px;padding:13px 14px;margin-top:10px;cursor:pointer;
+}
+.trivia .tq{font-weight:800;font-family:var(--font-head);font-size:13.5px;color:var(--sun);display:flex;justify-content:space-between;align-items:center;}
+.trivia .ta{font-size:13px;color:#E4ECF9;line-height:1.55;margin-top:8px;display:none;}
+.trivia.open .ta{display:block;}
+.trivia .chev{transition:transform .2s;}
+.trivia.open .chev{transform:rotate(180deg);}
+
+/* ===== Flashcards ===== */
+.flash-wrap{perspective:1200px;height:220px;margin-bottom:16px;}
+.flash-card{
+  position:relative;width:100%;height:100%;transform-style:preserve-3d;
+  transition:transform .5s cubic-bezier(.4,.2,.2,1);cursor:pointer;
+}
+.flash-card.flipped{transform:rotateY(180deg);}
+.flash-face{
+  position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:22px;text-align:center;
+}
+.flash-front{background:linear-gradient(145deg, var(--sky-panel), var(--sky-mid));border:1px solid rgba(255,255,255,0.1);}
+.flash-back{background:linear-gradient(145deg, #1B6E63, #10453D);transform:rotateY(180deg);border:1px solid rgba(47,191,174,0.4);}
+.flash-term{font-family:var(--font-head);font-size:24px;color:var(--sun);margin-bottom:6px;}
+.flash-hint{font-size:11.5px;color:var(--mist-dim);}
+.flash-def{font-size:14.5px;line-height:1.55;color:#EAFBF5;}
+.flash-nav{display:flex;gap:10px;align-items:center;justify-content:space-between;}
+.flash-count{font-family:var(--font-head);font-weight:700;font-size:13px;color:var(--mist-dim);}
+.flash-btn{flex:1;}
+
+/* ===== Q&A Vault ===== */
+.vault-section{margin-bottom:16px;}
+.vault-title{
+  font-family:var(--font-head);font-size:14px;color:var(--teal);
+  display:flex;align-items:center;gap:7px;margin:0 0 8px;padding-left:2px;
+}
+.vault-title .dot{width:7px;height:7px;border-radius:50%;background:var(--teal);}
+.qa-item{background:rgba(255,255,255,0.045);border:1px solid rgba(255,255,255,0.07);border-radius:13px;padding:13px 14px;margin-bottom:8px;cursor:pointer;}
+.qa-q{font-size:13.5px;font-weight:700;color:var(--mist);display:flex;justify-content:space-between;gap:10px;}
+.qa-q .num{color:var(--sun);font-family:var(--font-head);margin-right:6px;}
+.qa-a{font-size:13px;line-height:1.6;color:#D7E4F5;margin-top:9px;display:none;padding-top:9px;border-top:1px dashed rgba(255,255,255,0.12);}
+.qa-item.open .qa-a{display:block;}
+.qa-item .chev{transition:transform .2s;flex-shrink:0;opacity:0.6;}
+.qa-item.open .chev{transform:rotate(180deg);}
+.search-wrap{position:sticky;top:60px;z-index:20;padding:6px 0 12px;background:linear-gradient(180deg, rgba(16,27,51,0.97) 75%, rgba(16,27,51,0));}
+.search-box{
+  width:100%;padding:12px 14px;border-radius:13px;border:1px solid rgba(255,255,255,0.12);
+  background:rgba(255,255,255,0.07);color:var(--mist);font-size:14px;font-family:var(--font-body);
+}
+.search-box::placeholder{color:var(--mist-dim);}
+
+/* ===== Badges ===== */
+.badge-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:6px;}
+.badge-cell{
+  background:rgba(255,255,255,0.05);border-radius:16px;padding:14px 8px;text-align:center;
+  border:1px solid rgba(255,255,255,0.07);
+}
+.badge-cell.locked{opacity:0.35;}
+.badge-emoji{font-size:30px;margin-bottom:6px;}
+.badge-name{font-size:10.5px;font-weight:800;color:var(--mist);line-height:1.3;}
+
+/* misc */
+.section-title{font-family:var(--font-head);font-size:18px;color:var(--mist);margin:4px 0 2px;}
+.section-desc{color:var(--mist-dim);font-size:13px;margin:0 0 16px;}
+.toast{
+  position:fixed;top:70px;left:50%;transform:translateX(-50%);
+  background:#1B2C4E;border:1px solid rgba(255,255,255,0.15);color:var(--mist);
+  padding:10px 18px;border-radius:999px;font-weight:700;font-size:13px;z-index:200;
+  box-shadow:0 6px 20px rgba(0,0,0,0.4);opacity:0;pointer-events:none;transition:opacity .2s, transform .2s;
+  font-family:var(--font-head);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(4px);}
+.hearts-warning{background:rgba(255,111,89,0.15);border:1px solid rgba(255,111,89,0.4);border-radius:13px;padding:14px;text-align:center;margin-top:10px;}
+
+/* ===== Practice Test ===== */
+.test-mode-card{
+  background:linear-gradient(160deg, var(--sky-panel), var(--sky-mid));
+  border:1px solid rgba(255,255,255,0.08);border-radius:18px;padding:18px;margin-bottom:14px;
+  cursor:pointer;transition:transform .12s;
+}
+.test-mode-card:active{transform:scale(0.98);}
+.test-mode-card .tm-top{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+.test-mode-card .tm-icon{font-size:28px;}
+.test-mode-card .tm-title{font-family:var(--font-head);font-size:16.5px;color:var(--mist);}
+.test-mode-card .tm-desc{font-size:12.5px;color:var(--mist-dim);line-height:1.5;margin:0;}
+.test-mode-card .tm-meta{display:flex;gap:8px;margin-top:10px;}
+.timer-bar-wrap{
+  position:sticky;top:60px;z-index:20;background:rgba(16,27,51,0.95);padding:8px 0 12px;
+}
+.timer-pill{
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);
+  border-radius:13px;padding:10px 14px;
+}
+.timer-pill .tclock{font-family:var(--font-head);font-weight:800;font-size:17px;color:var(--sun);}
+.timer-pill .tclock.low{color:var(--bad);}
+.timer-pill .tq-count{font-size:12px;color:var(--mist-dim);font-weight:700;}
+.self-grade-textarea{
+  width:100%;min-height:90px;padding:13px;border-radius:13px;border:2px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.06);color:var(--mist);font-size:14px;font-family:var(--font-body);
+  resize:vertical;margin-bottom:12px;
+}
+.self-grade-textarea:focus{outline:none;border-color:var(--teal);}
+.model-answer-box{
+  background:rgba(79,163,216,0.13);border:1px solid rgba(79,163,216,0.35);border-radius:13px;
+  padding:13px 14px;font-size:13.5px;line-height:1.6;color:#DCEBFA;margin-bottom:14px;
+}
+.model-answer-box b{color:#fff;display:block;margin-bottom:4px;font-family:var(--font-head);font-size:12px;letter-spacing:0.3px;}
+.self-grade-btns{display:flex;gap:10px;}
+.self-grade-btns .btn{flex:1;}
+.test-result-row{
+  display:flex;align-items:flex-start;gap:10px;padding:12px 13px;border-radius:12px;margin-bottom:8px;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);
+}
+.test-result-row .tr-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.test-result-row .tr-q{font-size:12.5px;color:#DCE6F5;line-height:1.5;}
+.test-result-row .tr-q b{color:var(--mist);}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-badge">🌤️</div>
+      <div>
+        <div class="brand-title">SkyQuest</div>
+        <div class="brand-sub">CH. 7 · AIR, WATER AND WEATHER</div>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat-chip stat-xp">⚡ <span id="xpVal">0</span></div>
+      <div class="stat-chip stat-streak">🔥 <span id="streakVal">0</span></div>
+      <div class="stat-chip stat-heart">❤️ <span id="heartVal">5</span></div>
+    </div>
+  </div>
+
+  <!-- ===================== JOURNEY ===================== -->
+  <div class="screen active" id="screen-journey">
+    <div class="journey-head">
+      <h1>Your Sky Journey</h1>
+      <p style="margin-bottom:6px;"><b>Chapter 7: Air, Water and Weather</b></p>
+      <p>Meet <b>Zephyr</b>, your cloud guide, and climb from rain puddles to outer space — mastering every topic in the chapter, one stop at a time.</p>
+    </div>
+    <div class="path" id="pathContainer"></div>
+    <div style="text-align:center;margin-top:6px;">
+      <button class="btn btn-ghost" style="width:auto;padding:9px 18px;font-size:12.5px;" onclick="resetProgress()">↺ Reset Progress</button>
+    </div>
+  </div>
+
+  <!-- ===================== EXPLORE ===================== -->
+  <div class="screen" id="screen-explore">
+    <div class="section-title">Explore the Science</div>
+    <div class="section-desc">Diagrams and deep-dive facts, straight from the chapter.</div>
+    <div id="exploreContent"></div>
+  </div>
+
+  <!-- ===================== FLASHCARDS ===================== -->
+  <div class="screen" id="screen-flash">
+    <div class="section-title">Word Cards</div>
+    <div class="section-desc">Tap a card to flip it. Swipe through all the key words.</div>
+    <div class="flash-wrap" id="flashWrap"></div>
+    <div class="flash-nav">
+      <button class="btn btn-ghost flash-btn" onclick="flashPrev()">← Prev</button>
+      <div class="flash-count" id="flashCount">1 / 21</div>
+      <button class="btn btn-ghost flash-btn" onclick="flashNext()">Next →</button>
+    </div>
+  </div>
+
+  <!-- ===================== Q&A VAULT ===================== -->
+  <div class="screen" id="screen-vault">
+    <div class="section-title">Q&amp;A Vault</div>
+    <div class="section-desc">Every question from the chapter and worksheet — tap any question to reveal the answer.</div>
+    <div class="search-wrap">
+      <input class="search-box" id="vaultSearch" placeholder="🔍 Search a question or keyword..." oninput="renderVault()">
+    </div>
+    <div id="vaultContent"></div>
+  </div>
+
+  <!-- ===================== PRACTICE TEST ===================== -->
+  <div class="screen" id="screen-test">
+    <div class="section-title">Practice Test</div>
+    <div class="section-desc">A timed mock exam, just like school — mixed questions plus written answers you grade yourself.</div>
+    <div id="testArea"></div>
+  </div>
+
+  <div class="tabbar">
+    <button class="tab-btn active" data-tab="journey" onclick="switchTab('journey')">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 2C8 6 5 10 5 14a7 7 0 0014 0c0-4-3-8-7-12z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      Journey
+    </button>
+    <button class="tab-btn" data-tab="explore" onclick="switchTab('explore')">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      Explore
+    </button>
+    <button class="tab-btn" data-tab="flash" onclick="switchTab('flash')">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="14" height="10" rx="2" stroke="currentColor" stroke-width="2"/><rect x="7" y="9" width="14" height="10" rx="2" fill="var(--sky-deep)" stroke="currentColor" stroke-width="2"/></svg>
+      Cards
+    </button>
+    <button class="tab-btn" data-tab="vault" onclick="switchTab('vault')">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Q&amp;A
+    </button>
+    <button class="tab-btn" data-tab="test" onclick="switchTab('test')">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      Test
+    </button>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   DATA
+========================================================= */
+const LEVELS = [
+{
+  id:1, icon:'💧', color:'linear-gradient(145deg,#4FA3D8,#2E6FA8)', name:'Weather Watch', sub:'What is weather?',
+  lesson:`
+    <h2>💧 Weather Watch</h2>
+    <p><b>Weather</b> is the state of the atmosphere of a place at a particular time — how hot, cold, cloudy, dry, sunny, windy or rainy it is.</p>
+    <p>Weather isn't fixed — it can change from day to day, or even within a few hours of the same day! That's why we pick our clothes, food and drinks based on today's weather.</p>
+    <div class="pill-row">
+      <span class="pill">☀️ Sunny</span><span class="pill">☁️ Cloudy</span><span class="pill">💨 Windy</span>
+      <span class="pill">🌧️ Rainy</span><span class="pill">🥵 Hot</span><span class="pill">🥶 Cold</span>
+    </div>
+    <h3>Try spotting the weather</h3>
+    <p>🌂 Ria is splashing in a puddle with her umbrella → it's a <b>rainy</b> day.<br>
+    ⚽ Abid feels hot playing football under a bright sun → it's a <b>sunny/hot</b> day.<br>
+    🪁 Madhavan's kite is soaring high → it must be a <b>windy</b> day.<br>
+    🧣 Kids in woollens while the Sun hides behind clouds → it's a <b>cold</b> day.</p>
+  `,
+  quiz:[
+    {type:'mcq', q:'Ria is carrying an umbrella and playing in a puddle of water. What kind of day is it?', options:['Sunny day','Rainy day','Windy day','Cold day'], answer:1, explain:'Umbrellas and puddles are the biggest clues — this is a rainy day!'},
+    {type:'mcq', q:"Abid is playing football. The Sun is shining brightly and he feels hot and thirsty. It is a...", options:['Rainy day','Cold day','Sunny (hot) day','Foggy day'], answer:2, explain:'Bright sun + feeling hot and thirsty = a sunny, hot day.'},
+    {type:'mcq', q:'Madhavan is flying a kite high in the sky. What kind of day is it?', options:['Windy day','Rainy day','Humid day','Cold day'], answer:0, explain:'Kites need moving air to fly — a windy day is perfect for this.'},
+    {type:'tf', q:'Weather can change from day to day, or even within hours of the same day.', answer:true, explain:'True — weather is never fixed; it keeps changing.'},
+    {type:'fill', q:'We choose our clothes, foods and drinks according to the ____.', answer:'weather', explain:'We dress and eat according to the weather of the day.'},
+    {type:'mcq', q:'The Sun is hiding behind clouds, and children are wearing woollen clothes. It is a...', options:['Hot day','Cold day','Windy day','Sunny day'], answer:1, explain:'Woollens + hidden Sun = a cold day.'},
+  ]
+},
+{
+  id:2, icon:'☀️', color:'linear-gradient(145deg,#FFC96B,#F08A24)', name:"Sun's Rhythm", sub:'Rotation & Revolution',
+  lesson:`
+    <h2>☀️ The Sun Connection</h2>
+    <p>The Sun causes almost <b>all</b> weather changes. Heat, cold, wind, cloudiness and rain all trace back to the Sun heating the Earth.</p>
+    <h3>Rotation — Day & Night</h3>
+    <p>The Earth spins on its own axis — this spinning motion is called <b>rotation</b>. The side facing the Sun has day (and is warmer); the side facing away has night (and is cooler, since no sunrays reach it).</p>
+    <h3>Revolution — Seasons</h3>
+    <p>The Earth also travels around the Sun in a fixed path — this is called <b>revolution</b>. Because the Earth is tilted on its axis, one part leans toward the Sun (getting more heat and longer days — <b>summer</b>) while the opposite part leans away (getting <b>winter</b>).</p>
+    <h3>Sun–Wind Connection</h3>
+    <p>The Sun's warmth heats the air, making it lighter so it rises. Cooler, heavier air rushes in to take its place — and that moving air is <b>wind</b>.</p>
+  `,
+  quiz:[
+    {type:'mcq', q:'The Earth moves around the Sun in its fixed orbit. This is called...', options:['Rotation','Revolution','Season','Atmosphere'], answer:1, explain:'Revolution = Earth travelling around the Sun. This causes seasons.'},
+    {type:'tf', q:'The revolution of the Earth around the Sun causes day and night.', answer:false, explain:'False — it is rotation (Earth spinning on its axis) that causes day and night. Revolution causes seasons.'},
+    {type:'mcq', q:'What causes day and night?', options:["Earth's revolution around the Sun","Earth's rotation on its own axis",'Clouds blocking sunlight','Wind direction'], answer:1, explain:'Rotation makes one side face the Sun (day) and the other face away (night).'},
+    {type:'fill', q:'The part of the Earth tilted towards the Sun experiences longer days and the season of ____.', answer:'summer', explain:'More direct sunlight and longer days = summer.'},
+    {type:'mcq', q:"Why does the Sun's warmth cause wind?", options:['It cools the air, making it sink','It heats air, making it rise, so cooler air rushes in','It has no effect on air movement','It only affects water, not air'], answer:1, explain:'Warm air is lighter and rises; cooler, heavier air moves in to replace it — this moving air is wind.'},
+  ]
+},
+{
+  id:3, icon:'🌬️', color:'linear-gradient(145deg,#8FD9CE,#2FBFAE)', name:'Wind & Breezes', sub:'Air, storms, sea & land breeze',
+  lesson:`
+    <h2>🌬️ More About Air</h2>
+    <p><b>Air</b> is an invisible mixture of gases — oxygen, carbon dioxide, water vapour, smoke and dust. The layer of air around the Earth is called the <b>atmosphere</b>.</p>
+    <p>Moving air is called <b>wind</b>. A gentle wind is a <b>breeze</b>. A very strong, destructive wind is a <b>storm</b>. When a storm brings thunder and rain too, it's a <b>thunderstorm</b>.</p>
+    <h3>Sea Breeze (Daytime)</h3>
+    <p>By day, land heats up faster than water. Warm air over the land rises, and cool air from the sea rushes in to take its place — this is <b>sea breeze</b>.</p>
+    <h3>Land Breeze (Night)</h3>
+    <p>At night, land cools down faster than water. Warm air now sits over the sea and rises, so cool air from the land moves out towards the sea — this is <b>land breeze</b>.</p>
+    <p>Remember: hot air is <b>lighter</b> and rises; cold air is <b>heavier</b> and sinks — this difference drives every breeze.</p>
+  `,
+  quiz:[
+    {type:'fill', q:'____ is an invisible mixture of gases such as oxygen, carbon dioxide, water vapour, smoke and dust.', answer:'air', explain:'Air is that invisible mixture all around us.'},
+    {type:'tf', q:'The blanket of air surrounding our Earth is called space.', answer:false, explain:'False — it is called the atmosphere, not space.'},
+    {type:'mcq', q:'The cool air from the sea moves towards the land and takes its place. This is known as...', options:['Thunderstorm','Land breeze','Sea breeze','Storm'], answer:2, explain:'This daytime flow of cool sea air onto warmer land is the sea breeze.'},
+    {type:'mcq', q:'What is land breeze?', options:['Cool air from the sea moving to land during the day','Cool air from the land moving towards the sea at night','A very strong destructive wind','A gentle wind over the mountains'], answer:1, explain:'At night the land cools faster, so cool land air flows out towards the warmer sea.'},
+    {type:'tf', q:'Hot air sinks and cold air rises up in the atmosphere.', answer:false, explain:"False — it's the opposite! Hot air is lighter and rises; cold air is heavier and sinks."},
+    {type:'mcq', q:'What is the difference between a storm and a thunderstorm?', options:['They are exactly the same','A storm is gentle; a thunderstorm is strong','A thunderstorm is a storm accompanied by thunder and rain','A storm only happens at sea'], answer:2, explain:'A storm is a very strong, destructive wind. When it comes with thunder and rain, it becomes a thunderstorm.'},
+  ]
+},
+{
+  id:4, icon:'🌦️', color:'linear-gradient(145deg,#8AB6F0,#4A6FD8)', name:"Water's Cycle", sub:'Evaporation to precipitation',
+  lesson:`
+    <h2>🌦️ Water Changes Form</h2>
+    <p>Water exists in three forms — solid (ice), liquid (water) and gas (water vapour/steam) — and switches between them on heating or cooling.</p>
+    <h3>Evaporation</h3>
+    <p>When water is heated, it turns into water vapour — this is <b>evaporation</b>. It happens faster with more heat, more wind, a larger exposed water surface, and drier air.</p>
+    <h3>Condensation</h3>
+    <p>When water vapour cools, it turns back into tiny water droplets — this is <b>condensation</b>. Rising water vapour condenses high up to form clouds.</p>
+    <ul>
+      <li><b>Dew</b> — droplets from condensation on cold surfaces at night</li>
+      <li><b>Frost</b> — a thin layer of ice crystals in very cold weather</li>
+      <li><b>Fog</b> — suspended droplets/ice crystals near the ground, mainly in winter, that reduce visibility</li>
+      <li><b>Mist</b> — a milder, lighter form of fog</li>
+    </ul>
+    <h3>Precipitation</h3>
+    <p>When clouds get too heavy, water falls back down as <b>rain, snow, hail or sleet</b>.</p>
+    <h3>The Full Cycle</h3>
+    <p>Evaporation → Condensation → Precipitation → Collection (in rivers, lakes, oceans and underground) — and it repeats forever. This is the <b>water cycle</b>.</p>
+  `,
+  quiz:[
+    {type:'fill', q:'The process in which water changes from liquid to gas is called ____.', answer:'evaporation', explain:'Heating turns liquid water into water vapour — evaporation.'},
+    {type:'fill', q:'The thin layer of ice crystals formed due to very cold weather is known as ____.', answer:'frost', explain:'Frost forms in very cold conditions.'},
+    {type:'mcq', q:'____ refers to any form of liquid or solid water particles that fall from the atmosphere and reach the surface of the Earth.', options:['Condensation','Evaporation','Mist','Precipitation'], answer:3, explain:'Precipitation covers rain, snow, hail and sleet.'},
+    {type:'mcq', q:'What is the difference between mist and fog?', options:['They are unrelated phenomena','Mist is a milder, lighter form of fog','Fog only happens in summer','Mist only forms over oceans'], answer:1, explain:'Both are suspended water droplets near the ground reducing visibility, but mist is the lighter version.'},
+    {type:'mcq', q:'Rashim accidentally dissolved 3 tablespoons of salt in a cup of water. How can he separate the salt back out?', options:['Filter it through paper','Let it stand so salt settles','Heat it so the water evaporates, leaving salt behind','Freeze the mixture'], answer:2, explain:'Salt is a soluble impurity — filtration cannot remove it. Heating evaporates the water, leaving solid salt crystals behind.'},
+    {type:'mcq', q:'Why do coastal areas often have humid weather?', options:['They receive more rain than deserts','Constant evaporation from the nearby sea keeps water vapour in the air','They are always cold','There is no wind near coasts'], answer:1, explain:'The sea keeps evaporating, filling coastal air with water vapour — that\'s humidity.'},
+    {type:'tf', q:'Dew, frost, fog and rain are all different forms of water.', answer:true, explain:'True — all of these are water in different physical forms, caused by evaporation, condensation and precipitation.'},
+  ]
+},
+{
+  id:5, icon:'🧪', color:'linear-gradient(145deg,#B79CF0,#7A5CD8)', name:'Clean Water Lab', sub:'Purifying water',
+  lesson:`
+    <h2>🧪 Making Water Fit for Use</h2>
+    <p>Water can carry three kinds of impurities: <b>insoluble</b> (visible, suspended particles), <b>soluble</b> (dissolved, invisible) and <b>germs</b> (tiny disease-causing organisms).</p>
+    <h3>Sedimentation & Decantation</h3>
+    <p>Let impure water stand — heavier particles settle at the bottom (<b>sedimentation</b>). Carefully pour off the clear water on top into another vessel (<b>decantation</b>).</p>
+    <h3>Filtration</h3>
+    <p>Pass unclean water through filter paper — impurities stay on the paper, clean water (filtrate) passes through. Underground water gets naturally filtered this way through soil layers.</p>
+    <h3>Boiling</h3>
+    <p>The simplest purification method — boil water for at least 5 minutes to kill germs, then keep it covered.</p>
+    <h3>Chlorination</h3>
+    <p>Adding <b>chlorine</b> to water kills germs — this process is called chlorination.</p>
+    <p>Drinking dirty, germ-carrying (<b>contaminated</b>) water causes <b>water-borne diseases</b> like diarrhoea and stomach infections.</p>
+  `,
+  quiz:[
+    {type:'mcq', q:'In which method is unclean water passed through filter paper?', options:['Chlorination','Boiling','Filtration','Decantation'], answer:2, explain:'Filtration uses filter paper to trap impurities while clean water passes through.'},
+    {type:'fill', q:'Impurities that are suspended in water and can be seen easily are known as ____ impurities.', answer:'insoluble', explain:'Insoluble impurities are visible and don\'t dissolve.'},
+    {type:'fill', q:'____ is a chemical added to water to kill germs present in it.', answer:'chlorine', explain:'Chlorine kills germs — the process is called chlorination.'},
+    {type:'mcq', q:'What is chlorination?', options:['Boiling water for 5 minutes','Passing water through filter paper','The process of adding chlorine to kill germs in water','Letting impurities settle at the bottom'], answer:2, explain:'Chlorination = adding chlorine to water to kill germs.'},
+    {type:'mcq', q:'How can insoluble impurities be removed from water?', options:['Only by chlorination','Sedimentation & decantation, or filtration','By adding more water','They cannot be removed'], answer:1, explain:'Both methods work: letting particles settle and pouring off clean water, or filtering through paper.'},
+    {type:'mcq', q:"What's the key difference between filtration and boiling?", options:['They do the exact same job','Filtration removes insoluble solids; boiling kills germs','Boiling removes solids; filtration kills germs','Neither purifies water'], answer:1, explain:'Filtration traps solid particles like sand; boiling kills disease-causing germs.'},
+    {type:'mcq', q:'Manzhar bathed in a pond and later got rashes, fever and vomiting. What likely happened?', options:['He ate street food','The pond water was contaminated with germs','He stayed in the sun too long','He drank boiled water'], answer:1, explain:'Contaminated water carries germs that can cause skin infections and water-borne illness.'},
+  ]
+},
+{
+  id:6, icon:'🏆', color:'linear-gradient(145deg,#FFE29A,#FFB13D)', name:'Sky Master Challenge', sub:'Final boss — mixed review', boss:true,
+  lesson:`
+    <h2>🏆 Sky Master Challenge</h2>
+    <p>You've explored weather, the Sun, wind, water's journey and purification. Now prove you're a true <b>Sky Master</b> with a mixed final challenge pulling from the whole chapter!</p>
+    <p>This level has extra questions and needs a sharp mind — good luck, Swarup!</p>
+  `,
+  quiz:[
+    {type:'mcq', q:'What is the layer of air that surrounds the Earth called?', options:['Space','Orbit','Atmosphere','Stratosphere layer'], answer:2, explain:'The atmosphere is the blanket of air around the Earth.'},
+    {type:'fill', q:'The Earth spinning on its own axis is called ____.', answer:'rotation', explain:'Rotation causes day and night.'},
+    {type:'mcq', q:'What is the largest ocean in the world?', options:['Atlantic Ocean','Indian Ocean','Pacific Ocean','Arctic Ocean'], answer:2, explain:'The Pacific Ocean covers about 30% of the Earth\'s surface — the largest ocean.'},
+    {type:'mcq', q:'Which is the smallest ocean in the world?', options:['Arctic Ocean','Indian Ocean','Southern Ocean','Atlantic Ocean'], answer:0, explain:'The Arctic Ocean is the smallest of the world\'s oceans.'},
+    {type:'mcq', q:'What is a cloudburst?', options:['A cloud that changes colour','A sudden, very heavy rainfall over a small area in a short time','A type of thunderstorm cloud shape','Fog forming over clouds'], answer:1, explain:'A cloudburst is intense, sudden rainfall that can cause flash flooding.'},
+    {type:'mcq', q:'What is reverse osmosis (RO)?', options:['Boiling water twice','Forcing water through a membrane that blocks salts and germs','Adding chlorine to water','Freezing water to purify it'], answer:1, explain:'RO forces water through a fine membrane, letting only water molecules pass, blocking impurities.'},
+    {type:'tf', q:'About 71% of the Earth\'s surface is covered with water.', answer:true, explain:'True — though only about 0.3% of it is usable freshwater.'},
+    {type:'mcq', q:'Sand heats up and cools down quickly. Why do villagers keep drinking-water pots (matkas) in wet sand?', options:['To make the water taste better','Because wet sand cools quickly, helping keep the water cool','To filter the water','To purify the water with chlorine'], answer:1, explain:'Wet sand cools rapidly through evaporation, keeping the matka and its water cool.'},
+    {type:'mcq', q:'Which correctly describes the water cycle order?', options:['Precipitation → Evaporation → Condensation → Collection','Evaporation → Condensation → Precipitation → Collection','Collection → Precipitation → Evaporation → Condensation','Condensation → Collection → Evaporation → Precipitation'], answer:1, explain:'Water evaporates, vapour condenses into clouds, clouds precipitate, and water collects again — repeating endlessly.'},
+    {type:'fill', q:'Pellets of frozen rain are called ____.', answer:'hail', explain:'Hail is frozen rain that falls as pellets of ice.'},
+  ]
+}
+];
+
+const VOCAB = [
+  {term:'Rotation', def:'The Earth spinning on its own axis. This movement causes day and night.'},
+  {term:'Revolution', def:"The Earth's movement around the Sun in its fixed orbit. This causes the seasons."},
+  {term:'Atmosphere', def:'The layer of air that surrounds the Earth.'},
+  {term:'Wind', def:'Air that is moving.'},
+  {term:'Breeze', def:'A gentle wind.'},
+  {term:'Storm', def:'A very strong wind that can cause damage and destruction.'},
+  {term:'Thunderstorm', def:'A storm accompanied by thunder and rain.'},
+  {term:'Sea breeze', def:'Cool air from the sea that moves towards the land during the day, replacing rising warm air.'},
+  {term:'Land breeze', def:'Cool air from the land that moves towards the sea at night, replacing rising warm air over the sea.'},
+  {term:'Evaporation', def:'The process by which heated water (liquid) changes into water vapour (gas).'},
+  {term:'Condensation', def:'The process by which water vapour, on cooling, changes into tiny droplets of water.'},
+  {term:'Precipitation', def:'Any form of liquid or solid water particles (rain, snow, hail, sleet) that fall from the atmosphere to Earth.'},
+  {term:'Dew', def:'Water droplets formed by condensation of atmospheric water vapour on cold surfaces at night.'},
+  {term:'Frost', def:'A thin layer of ice crystals that forms due to very cold weather.'},
+  {term:'Fog', def:"Suspended water droplets or ice crystals near the Earth's surface, mainly in winter, that reduce visibility."},
+  {term:'Mist', def:'A milder, lighter form of fog — also reduces visibility near the ground.'},
+  {term:'Water cycle', def:'The continuous, repeating cycle of evaporation, condensation, precipitation and collection of water in nature.'},
+  {term:'Sedimentation', def:'Letting impure water stand so heavier impurities settle down at the bottom.'},
+  {term:'Decantation', def:'Carefully pouring off the clean water on top into another vessel, leaving settled impurities behind.'},
+  {term:'Chlorination', def:'The process of adding chlorine to water to kill germs present in it.'},
+  {term:'Contaminated water', def:'Water that is dirty and carries germs — drinking it can cause water-borne diseases.'},
+];
+
+const VAULT = [
+  { section:"What I Know (Weather Pictures)", items:[
+    {q:"Ria is carrying an umbrella and playing in a puddle of water. What kind of day is it?", a:"It is a rainy day."},
+    {q:"Abid is playing football; the Sun is shining brightly and he feels hot and thirsty. What kind of day is it?", a:"It is a sunny (hot) day."},
+    {q:"Madhavan is flying a kite. What kind of day is it?", a:"It is a windy day."},
+    {q:"The Sun is hiding behind clouds and children are wearing woollen clothes. What kind of day is it?", a:"It is a cold day."},
+  ]},
+  { section:"Think & Answer (HOTS boxes)", items:[
+    {q:"Why do coastal areas have humid weather?", a:"Coastal areas are close to the sea, so a lot of water keeps evaporating from the sea. This water vapour stays in the air near the coast, making the air humid."},
+    {q:"What is a cloudburst?", a:"A cloudburst is a sudden, very heavy rainfall that occurs over a small area in a very short time, often causing flooding."},
+    {q:"Which is the smallest ocean in the world?", a:"The Arctic Ocean is the smallest ocean in the world."},
+    {q:"Rashim mistakenly mixed 3 tablespoons of salt, instead of powdered sugar, in 1 cup of water. The salt completely dissolved. How can he separate salt from water?", a:"Salt dissolves in water, so it cannot be removed by filtration. Rashim should heat the salt water until all the water evaporates. The water turns into vapour and escapes into the air, while the salt (a soluble impurity) remains behind as solid crystals."},
+    {q:"What is reverse osmosis?", a:"Reverse osmosis (RO) is a water purification method in which impure water is forced through a special fine membrane under pressure. The membrane allows only water molecules to pass through and blocks dissolved salts, germs and other impurities, giving clean, safe drinking water. This is the technology used in RO water purifiers."},
+  ]},
+  { section:"Checkpoint — True or False", items:[
+    {q:"The blanket of air surrounding our Earth is called space.", a:"False. It is called the atmosphere, not space."},
+    {q:"The revolution of the Earth around the Sun causes day and night.", a:"False. It is the rotation of the Earth on its own axis that causes day and night. Revolution causes seasons."},
+    {q:"Dew, frost, fog, rain are all different forms of water.", a:"True. All of these are different forms in which water is found in nature."},
+    {q:"We should always purify water before drinking.", a:"True. Water may contain insoluble impurities, soluble impurities or germs, so it should always be purified before drinking."},
+    {q:"Hot air sinks and cold air rises up in the atmosphere.", a:"False. Hot air is lighter, so it rises up; cold air is heavier, so it sinks down."},
+  ]},
+  { section:"Tick the Correct Answer", items:[
+    {q:"The Earth moves around the Sun in its fixed orbit. This is called ____.", a:"a. revolution"},
+    {q:"The cool air from the sea moves towards the land and takes its place. This is known as ____.", a:"c. sea breeze"},
+    {q:"____ refers to any form of liquid or solid water particles that fall from the atmosphere and reach the surface of the Earth.", a:"d. Precipitation"},
+    {q:"In the ____ method, unclean water is passed through filter paper.", a:"c. filtration"},
+  ]},
+  { section:"Fill in the Blanks", items:[
+    {q:"____ is an invisible mixture of gases such as oxygen, carbon dioxide, water vapour, smoke and dust.", a:"Air"},
+    {q:"The process in which water changes from liquid to gas is called ____.", a:"Evaporation"},
+    {q:"The thin layer of ice crystals formed due to very cold weather is known as ____.", a:"Frost"},
+    {q:"Impurities that are suspended in water and can be seen are known as ____ impurities.", a:"Insoluble"},
+    {q:"____ is a chemical that is added to water to kill germs present in it.", a:"Chlorine"},
+  ]},
+  { section:"Unjumble the Words", items:[
+    {q:"OUNDESTHRTMR", a:"THUNDERSTORM"},
+    {q:"SITM", a:"MIST"},
+    {q:"WED", a:"DEW"},
+    {q:"IFLRTAITON", a:"FILTRATION"},
+    {q:"ISEDMNET", a:"SEDIMENT"},
+  ]},
+  { section:"Complete the Concept Map", items:[
+    {q:"S_N_Y, CL__D_, W_ND_, R__N_, H_T, CO_D — types of weather", a:"SUNNY, CLOUDY, WINDY, RAINY, HOT, COLD"},
+    {q:"What causes day and night, in Earth's movements?", a:"Rotation"},
+    {q:"What causes seasons, in Earth's movements?", a:"Revolution"},
+    {q:"The two breeze types under 'Air'", a:"Sea breeze and Land breeze"},
+    {q:"E_AP_____I_N, C_N___S_T___, _RE_IP_T__I__ — under 'Water'", a:"Evaporation, Condensation, Precipitation"},
+    {q:"___ Cycle (below evaporation/condensation/precipitation)", a:"Water Cycle"},
+    {q:"Four boxes after 'Water gets collected...'", a:"Rain, Snow, Hail, Sleet (forms of precipitation)"},
+    {q:"Boxes under 'Water purification'", a:"Sedimentation & Decantation, Filtration, Boiling, Chlorination"},
+  ]},
+  { section:"Short Answer Questions", items:[
+    {q:"Define revolution and rotation.", a:"Rotation: the Earth spinning on its own axis — causes day and night. Revolution: the Earth's movement around the Sun in its fixed orbit — causes seasons."},
+    {q:"What is the difference between a storm and a thunderstorm?", a:"A storm is a very strong wind that can cause damage and destruction. When a storm is accompanied by thunder and rain, it is called a thunderstorm."},
+    {q:"What is land breeze?", a:"At night, the land gets cooler faster than water. The air above the sea stays warm and rises up. The cool air from the land then moves in towards the sea and takes its place. This is called land breeze."},
+    {q:"What is the difference between mist and fog?", a:"Fog refers to suspended water droplets or ice crystals near the Earth's surface, mainly during winters, reducing visibility. Mist is also suspended droplets that reduce visibility, but it is a milder (lighter) form of fog."},
+    {q:"What is chlorination?", a:"Chlorination is the process of adding chlorine, a chemical, to water in order to kill the germs present in it, making the water safe to use."},
+  ]},
+  { section:"Long Answer Questions", items:[
+    {q:"How does the Sun help in creating sea breeze and land breeze?", a:"During the day, the Sun heats the land faster than water, so warm air over the land rises and cool sea air moves in — this is sea breeze. At night, land cools faster than water, so warm air over the sea rises and cool land air moves in — this is land breeze. In both cases, the Sun's heat sets up the temperature difference that drives these winds."},
+    {q:"What are the factors that affect the rate of evaporation?", a:"Temperature (higher = faster evaporation), Wind (speeds up evaporation), Area of water exposed (larger area = faster evaporation), and Dry air (drier air = faster evaporation, since less water vapour is already present)."},
+    {q:"Explain the water cycle.", a:"Water evaporates from oceans, rivers and lakes to form water vapour (evaporation). This vapour rises and condenses to form clouds (condensation). When clouds become too heavy, water falls as rain, snow, hail or sleet (precipitation). This water collects in rivers, lakes, oceans and underground (collection). This entire repeating cycle is the water cycle."},
+    {q:"How can we remove insoluble impurities from water? Explain.", a:"By sedimentation and decantation — let impure water stand so heavier impurities settle at the bottom (sedimentation), then carefully pour off the clean water into another vessel (decantation). Insoluble impurities can also be removed by filtration, passing water through filter paper."},
+    {q:"Explain the difference between filtration and boiling.", a:"Filtration passes water through filter paper to trap insoluble impurities like sand or mud, while clean water passes through. Boiling is the simplest purification method — boiling water for at least 5 minutes kills the germs in it. So filtration removes solid impurities, while boiling kills germs."},
+  ]},
+  { section:"Subject Connect", items:[
+    {q:"Research 'precautions against water-borne diseases' — what are some key precautions?", a:"Always drink clean, purified or boiled water. Store drinking water in clean, covered containers. Wash hands with soap before eating and after using the toilet. Avoid unclean street food/ice. Don't bathe in or drink from contaminated ponds, wells or rivers. Keep water tanks and surroundings clean and covered."},
+  ]},
+  { section:"Enrichment Activities — HOTS", items:[
+    {q:"How can you filter water with impurities such as soil particles, twigs and small stones?", a:"First pass the water through a coarse strainer, cloth, or wire mesh to remove large pieces like twigs and stones. Then pass it through filter paper to remove finer soil/sand particles, leaving clean filtered water."},
+    {q:"Compare underground water levels in pictures A (clean, open ground) and B (garbage-covered ground). How can we improve the situation?", a:"Picture A has a higher, cleaner underground water level since rain seeps in easily. Picture B has a lower level because garbage blocks rainwater from seeping in and can pollute it. We can improve this through rainwater harvesting, avoiding dumping waste on open land, planting more trees, and not over-using groundwater."},
+    {q:"In the figure, arrows 'a' rise from water into clouds and 'b' shows rain falling. Which statement is correct: (i) b is not the reverse of a, (ii) a happens when water cools, (iii) a also happens when wet clothes are left for drying, (iv) all of these?", a:"(iii) Process 'a' (evaporation) also happens when wet clothes are left for drying. (Statement i is wrong because precipitation IS the reverse of evaporation; statement ii is wrong because evaporation happens on heating, not cooling.)"},
+    {q:"Name and define processes 'a' and 'b' in that figure.", a:"Process a — Evaporation: water (liquid) changes into water vapour (gas) on heating. Process b — Precipitation: when clouds become too heavy with condensed water, droplets fall to Earth as rain, snow, hail or sleet."},
+  ]},
+  { section:"Enrichment Activities — Connect to Life", items:[
+    {q:"Jayanthi eats gol gappas from a street vendor in the rainy season and later gets a stomach ache and diarrhoea. Why?", a:"The gol gappa water (pani) was likely contaminated with germs from dirty or unpurified water. Drinking this caused a water-borne disease — stomach ache and diarrhoea."},
+    {q:"Manzhar bathed in a pond and got rashes, fever and vomiting. Why did this happen?", a:"The pond water was contaminated with germs and impurities. Bathing in it caused a skin infection (rashes), and swallowing some contaminated water may have caused fever and vomiting — symptoms of a water-borne disease."},
+    {q:"Why do vendors roast corn/peanuts in sand, and why do villagers keep drinking-water pots (matkas) in wet sand?", a:"Sand heats up quickly, making it easy to roast corn or peanuts in it. Sand also cools down quickly, so keeping matkas in wet sand helps keep the drinking water cool through evaporation."},
+  ]},
+  { section:"Research Activity", items:[
+    {q:"Aim: To understand that land heats up and cools down faster than water (soil beaker vs water beaker experiment with a lamp). What should you observe?", a:"While the lamp is ON, the soil beaker's temperature rises faster and higher than the water beaker's. After switching the lamp OFF, the soil beaker also cools down faster, while the water beaker's temperature falls more slowly. Conclusion: land heats up and cools down faster than water — this is exactly why sea breeze happens by day and land breeze happens at night."},
+  ]},
+];
+
+// Auto-built pool of every mcq/tf/fill question across all levels, for the Practice Test
+const ALL_AUTO_QUESTIONS = LEVELS.flatMap(l => l.quiz);
+
+// Short & Long answer questions (self-graded, straight from the textbook) for the Practice Test
+const SELF_GRADE_QUESTIONS = [
+  ...VAULT.find(s=>s.section==="Short Answer Questions").items,
+  ...VAULT.find(s=>s.section==="Long Answer Questions").items,
+];
+
+/* =========================================================
+   STATE
+========================================================= */
+let state = {
+  xp:0, streak:0, bestStreak:0, hearts:5,
+  levelProgress:{}, // id -> {complete:bool, stars:int}
+};
+LEVELS.forEach(l=>state.levelProgress[l.id]={complete:false, stars:0});
+
+let quizState = null;
+let flashIdx = 0;
+let flashFlipped = false;
+
+/* =========================================================
+   RENDER: TOP BAR
+========================================================= */
+function renderStats(){
+  document.getElementById('xpVal').textContent = state.xp;
+  document.getElementById('streakVal').textContent = state.streak;
+  document.getElementById('heartVal').textContent = state.hearts;
+}
+
+/* =========================================================
+   RENDER: JOURNEY PATH
+========================================================= */
+function isUnlocked(idx){ return true; } // all levels open, matching prior app style
+
+function renderPath(){
+  const c = document.getElementById('pathContainer');
+  c.innerHTML = '';
+  const aligns = ['left','right','center'];
+  LEVELS.forEach((lvl, i)=>{
+    const prog = state.levelProgress[lvl.id];
+    const row = document.createElement('div');
+    row.className = 'node-row ' + aligns[i%3];
+    const stars = prog.stars;
+    row.innerHTML = `
+      <div class="node-wrap">
+        <div class="node ${lvl.boss?'boss-node':''} ${prog.complete?'complete':''}" style="background:${lvl.color}" onclick="openLevel(${lvl.id})">
+          ${lvl.icon}
+        </div>
+        <div class="node-stars">${[1,2,3].map(s=>`<svg viewBox="0 0 24 24" fill="${s<=stars?'#FFD873':'rgba(255,255,255,0.25)'}"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.7 1.5 6.8L12 17l-6.1 3.5 1.5-6.8L2.2 9l6.9-.7z"/></svg>`).join('')}</div>
+        <div class="node-label">${lvl.name}</div>
+        <div class="node-sub">${lvl.sub}</div>
+      </div>
+    `;
+    c.appendChild(row);
+  });
+}
+
+/* =========================================================
+   LEVEL SHEET / LESSON
+========================================================= */
+function openLevel(id){
+  const lvl = LEVELS.find(l=>l.id===id);
+  const prog = state.levelProgress[id];
+  showSheet(`
+    ${lvl.lesson}
+    <div style="margin-top:18px;">
+      <button class="btn btn-primary" onclick="startQuiz(${id})">
+        ${prog.complete ? '🔁 Retry Quiz' : '▶ Start Quiz'} (${lvl.quiz.length} Qs)
+      </button>
+    </div>
+  `);
+}
+
+/* =========================================================
+   QUIZ
+========================================================= */
+function startQuiz(id){
+  const lvl = LEVELS.find(l=>l.id===id);
+  quizState = { levelId:id, qIndex:0, correctCount:0, answered:false, questions: shuffle([...lvl.quiz]) };
+  renderQuizQuestion();
+}
+
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
+  return arr;
+}
+
+function renderQuizQuestion(){
+  const qs = quizState.questions;
+  const idx = quizState.qIndex;
+  if(idx >= qs.length){ finishQuiz(); return; }
+  const q = qs[idx];
+  quizState.answered = false;
+
+  let progressHtml = qs.map((_,i)=>`<div class="${i<idx?'done':i===idx?'current':''}"></div>`).join('');
+  let tag = q.type==='mcq' ? 'MULTIPLE CHOICE' : q.type==='tf' ? 'TRUE OR FALSE' : 'FILL IN THE BLANK';
+  let bodyHtml = '';
+
+  if(q.type==='mcq'){
+    bodyHtml = q.options.map((opt,i)=>`<button class="opt" data-i="${i}" onclick="answerMcq(${i})">${opt}</button>`).join('');
+  } else if(q.type==='tf'){
+    bodyHtml = `
+      <button class="opt" data-i="1" onclick="answerTf(true)">True</button>
+      <button class="opt" data-i="0" onclick="answerTf(false)">False</button>
+    `;
+  } else if(q.type==='fill'){
+    bodyHtml = `
+      <input type="text" class="fill-input" id="fillInput" placeholder="Type your answer..." autocomplete="off">
+      <button class="btn btn-teal" onclick="answerFill()">Check Answer</button>
+    `;
+  }
+
+  document.getElementById('sheet').innerHTML = `
+    <div class="quiz-progress">${progressHtml}</div>
+    <div class="q-type-tag">${tag} · Q${idx+1} of ${qs.length}</div>
+    <div class="q-text">${q.q}</div>
+    <div id="quizBody">${bodyHtml}</div>
+    <div id="quizFeedback"></div>
+  `;
+  document.getElementById('overlay').classList.add('show');
+  if(q.type==='fill'){
+    setTimeout(()=>{ const el=document.getElementById('fillInput'); if(el){el.focus();} },100);
+  }
+}
+
+function lockOptions(){
+  document.querySelectorAll('#quizBody .opt').forEach(b=>b.style.pointerEvents='none');
+}
+
+function answerMcq(i){
+  if(quizState.answered) return;
+  quizState.answered = true;
+  const q = quizState.questions[quizState.qIndex];
+  const correct = i === q.answer;
+  document.querySelectorAll('#quizBody .opt').forEach((b,bi)=>{
+    if(bi===q.answer) b.classList.add('correct');
+    else if(bi===i) b.classList.add('wrong');
+    else b.classList.add('dim');
+  });
+  lockOptions();
+  handleResult(correct, q.explain);
+}
+
+function answerTf(val){
+  if(quizState.answered) return;
+  quizState.answered = true;
+  const q = quizState.questions[quizState.qIndex];
+  const correct = val === q.answer;
+  document.querySelectorAll('#quizBody .opt').forEach(b=>{
+    const bi = b.getAttribute('data-i')==='1';
+    if(bi===q.answer) b.classList.add('correct');
+    else if(bi===val) b.classList.add('wrong');
+    else b.classList.add('dim');
+  });
+  lockOptions();
+  handleResult(correct, q.explain);
+}
+
+function answerFill(){
+  if(quizState.answered) return;
+  const input = document.getElementById('fillInput');
+  const val = (input.value||'').trim().toLowerCase();
+  if(!val) { input.focus(); return; }
+  quizState.answered = true;
+  const q = quizState.questions[quizState.qIndex];
+  const correct = val === q.answer.toLowerCase() || val.includes(q.answer.toLowerCase());
+  input.disabled = true;
+  input.style.borderColor = correct ? 'var(--good)' : 'var(--bad)';
+  document.querySelector('#quizBody button').style.display = 'none';
+  handleResult(correct, q.explain, q.answer);
+}
+
+function handleResult(correct, explain, correctAnswer){
+  if(correct){
+    quizState.correctCount++;
+    state.xp += 10;
+    state.streak++;
+    if(state.streak > state.bestStreak) state.bestStreak = state.streak;
+  } else {
+    state.hearts = Math.max(0, state.hearts - 1);
+    state.streak = 0;
+  }
+  renderStats();
+  const fb = document.getElementById('quizFeedback');
+  fb.innerHTML = `
+    <div class="feedback-box ${correct?'good':'bad'}">
+      <b>${correct? '✓ Correct!' : (correctAnswer? '✗ Not quite — the answer was "'+correctAnswer+'".' : '✗ Not quite.')}</b><br>${explain}
+    </div>
+    <button class="btn ${correct?'btn-teal':'btn-primary'}" onclick="nextQuestion()">${quizState.qIndex+1 < quizState.questions.length ? 'Next Question →' : 'See Results 🎉'}</button>
+  `;
+}
+
+function nextQuestion(){
+  quizState.qIndex++;
+  renderQuizQuestion();
+}
+
+function finishQuiz(){
+  const lvl = LEVELS.find(l=>l.id===quizState.levelId);
+  const total = quizState.questions.length;
+  const correct = quizState.correctCount;
+  const pct = correct/total;
+  let stars = pct>=0.9 ? 3 : pct>=0.7 ? 2 : pct>=0.4 ? 1 : 0;
+  const prog = state.levelProgress[lvl.id];
+  const firstTimeComplete = !prog.complete && stars>0;
+  if(stars > prog.stars) prog.stars = stars;
+  if(stars > 0) prog.complete = true;
+  if(firstTimeComplete) { state.xp += 25; renderStats(); }
+
+  const emoji = pct>=0.9?'🌟':pct>=0.7?'🎉':pct>=0.4?'👍':'☁️';
+  const msg = pct>=0.9?"Outstanding! You're a true Sky Master in the making!":
+              pct>=0.7?'Great work! You really know your weather.':
+              pct>=0.4?'Nice effort! A quick review and you\'ll ace it.':
+              'Keep exploring the lesson — you\'ll get it next time!';
+
+  document.getElementById('sheet').innerHTML = `
+    <div class="result-center">
+      <div class="result-emoji">${emoji}</div>
+      <div class="result-title">${lvl.name} Complete!</div>
+      <div class="result-sub">${msg}</div>
+      <div class="result-stats">
+        <div class="result-stat"><b>${correct}/${total}</b><span>Correct</span></div>
+        <div class="result-stat"><b>${'⭐'.repeat(stars) || '—'}</b><span>Stars</span></div>
+        <div class="result-stat"><b>+${correct*10 + (firstTimeComplete?25:0)}</b><span>XP Earned</span></div>
+      </div>
+      <button class="btn btn-primary" onclick="closeSheet(); renderPath();">Continue</button>
+    </div>
+  `;
+  showToast(firstTimeComplete ? `🏅 ${lvl.name} badge earned!` : 'Quiz complete!');
+}
+
+/* =========================================================
+   SHEET / OVERLAY
+========================================================= */
+function showSheet(html){
+  document.getElementById('sheet').innerHTML = `
+    <div class="sheet-handle"></div>
+    <button class="sheet-close" onclick="closeSheet()">✕</button>
+    ${html}
+  `;
+  document.getElementById('overlay').classList.add('show');
+}
+function closeSheet(){
+  document.getElementById('overlay').classList.remove('show');
+  quizState = null;
+}
+document.getElementById('overlay').addEventListener('click', (e)=>{
+  if(e.target.id === 'overlay') closeSheet();
+});
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* =========================================================
+   TABS
+========================================================= */
+function switchTab(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  document.querySelector(`.tab-btn[data-tab="${name}"]`).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+/* =========================================================
+   EXPLORE TAB
+========================================================= */
+function renderExplore(){
+  const el = document.getElementById('exploreContent');
+  el.innerHTML = `
+    <div class="explore-card">
+      <h3 style="font-family:var(--font-head);color:var(--sun);margin:0 0 6px;">Rotation vs. Revolution</h3>
+      <p style="font-size:13px;color:#DCE6F5;line-height:1.55;margin:0;">Two different journeys — one spins Earth in place, the other carries it around the Sun.</p>
+      <div class="svg-wrap">
+        <svg viewBox="0 0 340 190" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="90" cy="95" r="70" fill="none" stroke="#3A5A8C" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <circle cx="90" cy="95" r="34" fill="#3E6FB0"/>
+          <path d="M90 61 A34 34 0 0 1 90 129 A34 34 0 0 0 90 61" fill="#1E3A63"/>
+          <circle cx="90" cy="95" r="34" fill="none" stroke="#8FB8ED" stroke-width="1.5"/>
+          <text x="90" y="150" text-anchor="middle" fill="#EAF2FB" font-size="12" font-family="Baloo 2" font-weight="700">Rotation</text>
+          <text x="90" y="166" text-anchor="middle" fill="#9FB4D6" font-size="9.5">Day &amp; Night</text>
+          <path d="M60 45 A45 45 0 0 1 130 45" fill="none" stroke="#8FB8ED" stroke-width="2" marker-end="url(#arrow1)"/>
+          <defs><marker id="arrow1" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#8FB8ED"/></marker></defs>
+
+          <ellipse cx="245" cy="95" rx="72" ry="34" fill="none" stroke="#3A5A8C" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <circle cx="180" cy="95" r="14" fill="#FFB13D"/>
+          <circle cx="245" cy="65" r="12" fill="#4A7FC4"/>
+          <circle cx="245" cy="125" r="12" fill="#C4544A"/>
+          <text x="245" y="46" text-anchor="middle" fill="#9FE3D8" font-size="9.5">Summer side</text>
+          <text x="245" y="150" text-anchor="middle" fill="#FFC2B8" font-size="9.5">Winter side</text>
+          <text x="245" y="166" text-anchor="middle" fill="#EAF2FB" font-size="12" font-family="Baloo 2" font-weight="700">Revolution</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="explore-card">
+      <h3 style="font-family:var(--font-head);color:var(--sun);margin:0 0 6px;">Sea Breeze &amp; Land Breeze</h3>
+      <p style="font-size:13px;color:#DCE6F5;line-height:1.55;margin:0;">Warm air always rises, cool air always rushes in to replace it — by day from the sea, by night from the land.</p>
+      <div class="svg-wrap">
+        <svg viewBox="0 0 340 170" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="0" width="160" height="170" rx="10" fill="#16324F"/>
+          <rect x="180" y="0" width="160" height="170" rx="10" fill="#0E1F3A"/>
+          <circle cx="40" cy="30" r="14" fill="#FFC96B"/>
+          <path d="M0 120 L60 100 L100 120 L160 130 L160 170 L0 170 Z" fill="#3C6B3F"/>
+          <path d="M0 130 L160 145 L160 170 L0 170 Z" fill="#2A5AA0"/>
+          <path d="M60 95 Q75 60 60 40" stroke="#FF9E5E" stroke-width="2" fill="none" marker-end="url(#arrow2)"/>
+          <path d="M150 110 Q110 105 65 100" stroke="#8FE0D8" stroke-width="2.5" fill="none" marker-end="url(#arrow2)"/>
+          <text x="80" y="16" text-anchor="middle" fill="#EAF2FB" font-size="10.5" font-family="Baloo 2" font-weight="700">DAY — Sea Breeze</text>
+          <text x="80" y="160" text-anchor="middle" fill="#CFE3F5" font-size="9">Warmer land, cooler sea</text>
+
+          <circle cx="300" cy="25" r="8" fill="#E8E8E8"/>
+          <path d="M180 130 L240 105 L280 120 L340 130 L340 170 L180 170 Z" fill="#12241C"/>
+          <path d="M180 140 L340 150 L340 170 L180 170 Z" fill="#1B4A82"/>
+          <path d="M250 100 Q265 65 300 45" stroke="#8FE0D8" stroke-width="2" fill="none" marker-end="url(#arrow2)"/>
+          <path d="M330 115 Q290 112 250 105" stroke="#FF9E5E" stroke-width="2.5" fill="none" marker-end="url(#arrow2)"/>
+          <text x="260" y="16" text-anchor="middle" fill="#EAF2FB" font-size="10.5" font-family="Baloo 2" font-weight="700">NIGHT — Land Breeze</text>
+          <text x="260" y="160" text-anchor="middle" fill="#CFE3F5" font-size="9">Warmer sea, cooler land</text>
+          <defs><marker id="arrow2" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#EAF2FB"/></marker></defs>
+        </svg>
+      </div>
+    </div>
+
+    <div class="explore-card">
+      <h3 style="font-family:var(--font-head);color:var(--sun);margin:0 0 6px;">The Water Cycle</h3>
+      <p style="font-size:13px;color:#DCE6F5;line-height:1.55;margin:0;">Evaporation → Condensation → Precipitation → Collection — and it repeats forever.</p>
+      <div class="svg-wrap">
+        <svg viewBox="0 0 340 210" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="270" cy="30" r="18" fill="#FFC96B"/>
+          <path d="M60 190 L120 130 L160 190 Z" fill="#4A6B4A"/>
+          <path d="M0 190 L340 190 L340 210 L0 210 Z" fill="#2A5AA0"/>
+          <ellipse cx="180" cy="55" rx="42" ry="20" fill="#DDE7F5"/>
+          <ellipse cx="215" cy="45" rx="30" ry="16" fill="#DDE7F5"/>
+          <path d="M100 178 Q95 140 105 120" stroke="#8FE0D8" stroke-width="2.5" fill="none" marker-end="url(#arrow3)" stroke-dasharray="2 3"/>
+          <path d="M150 120 Q165 90 175 70" stroke="#8FE0D8" stroke-width="2.5" fill="none" marker-end="url(#arrow3)" stroke-dasharray="2 3"/>
+          <path d="M175 70 Q195 100 190 175" stroke="#4FA3D8" stroke-width="2.5" fill="none" marker-end="url(#arrow3)"/>
+          <path d="M220 55 Q235 100 230 175" stroke="#4FA3D8" stroke-width="2.5" fill="none" marker-end="url(#arrow3)"/>
+          <text x="90" y="115" fill="#EAF2FB" font-size="9.5" font-family="Baloo 2" font-weight="700">Evaporation</text>
+          <text x="185" y="30" fill="#EAF2FB" font-size="9.5" font-family="Baloo 2" font-weight="700">Condensation</text>
+          <text x="235" y="140" fill="#EAF2FB" font-size="9.5" font-family="Baloo 2" font-weight="700">Precipitation</text>
+          <text x="55" y="205" fill="#EAF2FB" font-size="9.5" font-family="Baloo 2" font-weight="700">Collection</text>
+          <defs><marker id="arrow3" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#8FE0D8"/></marker></defs>
+        </svg>
+      </div>
+    </div>
+
+    <div class="explore-card">
+      <h3 style="font-family:var(--font-head);color:var(--sun);margin:0 0 6px;">Filtration Setup</h3>
+      <p style="font-size:13px;color:#DCE6F5;line-height:1.55;margin:0;">Impurities get trapped on the filter paper (residue); clean water (filtrate) drips through.</p>
+      <div class="svg-wrap">
+        <svg viewBox="0 0 260 190" xmlns="http://www.w3.org/2000/svg">
+          <path d="M70 20 L190 20 L150 90 L110 90 Z" fill="none" stroke="#8FB8ED" stroke-width="2.5"/>
+          <path d="M110 90 L150 90 L145 60 L115 60 Z" fill="#B98B5E" opacity="0.85"/>
+          <path d="M120 90 L140 90 L138 130 L122 130 Z" fill="none" stroke="#8FB8ED" stroke-width="2"/>
+          <path d="M90 150 L170 150 L155 185 L105 185 Z" fill="none" stroke="#4FA3D8" stroke-width="2.5"/>
+          <path d="M122 130 L122 155" stroke="#4FA3D8" stroke-width="2"/>
+          <path d="M130 155 L128 175" stroke="#4FA3D8" stroke-width="2" stroke-dasharray="2 3"/>
+          <text x="200" y="30" fill="#EAF2FB" font-size="10">Solution</text>
+          <text x="152" y="55" fill="#EAF2FB" font-size="10">Filter paper</text>
+          <text x="12" y="70" fill="#EAF2FB" font-size="10">Funnel</text>
+          <text x="14" y="60" fill="#FFC96B" font-size="10">Residue</text>
+          <text x="180" y="170" fill="#EAF2FB" font-size="10">Filtrate</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="trivia" onclick="this.classList.toggle('open')">
+      <div class="tq">💭 Why do coastal areas feel humid? <svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--sun)" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <div class="ta">The nearby sea keeps evaporating constantly, filling coastal air with water vapour — that's what makes the air feel humid.</div>
+    </div>
+    <div class="trivia" onclick="this.classList.toggle('open')">
+      <div class="tq">💭 What is "phantom rain"? <svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--sun)" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <div class="ta">In very dry, hot places like deserts, falling rain sometimes evaporates completely before it even touches the ground — this phenomenon is called phantom rain.</div>
+    </div>
+    <div class="trivia" onclick="this.classList.toggle('open')">
+      <div class="tq">💭 What is reverse osmosis? <svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--sun)" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <div class="ta">RO purifiers force water through a very fine membrane under pressure. Only water molecules pass through, while dissolved salts, germs and other impurities get blocked — giving clean drinking water.</div>
+    </div>
+    <div class="trivia" onclick="this.classList.toggle('open')">
+      <div class="tq">💭 How big is the Pacific Ocean? <svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--sun)" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <div class="ta">The Pacific Ocean is the largest ocean on Earth, covering about 30% of the Earth's entire surface. The Arctic Ocean, by contrast, is the smallest.</div>
+    </div>
+  `;
+}
+
+/* =========================================================
+   FLASHCARDS
+========================================================= */
+function renderFlash(){
+  const wrap = document.getElementById('flashWrap');
+  const v = VOCAB[flashIdx];
+  wrap.innerHTML = `
+    <div class="flash-card ${flashFlipped?'flipped':''}" onclick="toggleFlash()">
+      <div class="flash-face flash-front">
+        <div class="flash-term">${v.term}</div>
+        <div class="flash-hint">Tap to reveal meaning</div>
+      </div>
+      <div class="flash-face flash-back">
+        <div class="flash-def">${v.def}</div>
+      </div>
+    </div>
+  `;
+  document.getElementById('flashCount').textContent = `${flashIdx+1} / ${VOCAB.length}`;
+}
+function toggleFlash(){ flashFlipped = !flashFlipped; renderFlash(); }
+function flashNext(){ flashIdx = (flashIdx+1) % VOCAB.length; flashFlipped=false; renderFlash(); }
+function flashPrev(){ flashIdx = (flashIdx-1+VOCAB.length) % VOCAB.length; flashFlipped=false; renderFlash(); }
+
+/* =========================================================
+   Q&A VAULT
+========================================================= */
+function renderVault(){
+  const term = (document.getElementById('vaultSearch').value || '').toLowerCase();
+  const el = document.getElementById('vaultContent');
+  let html = '';
+  let anyResults = false;
+  VAULT.forEach(section=>{
+    const filtered = section.items.filter(it =>
+      !term || it.q.toLowerCase().includes(term) || it.a.toLowerCase().includes(term)
+    );
+    if(filtered.length === 0) return;
+    anyResults = true;
+    html += `<div class="vault-section">
+      <div class="vault-title"><span class="dot"></span>${section.section}</div>
+      ${filtered.map((it,i)=>`
+        <div class="qa-item" onclick="this.classList.toggle('open')">
+          <div class="qa-q"><span><span class="num">${i+1}.</span>${it.q}</span>
+            <svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--teal)" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <div class="qa-a">${it.a}</div>
+        </div>
+      `).join('')}
+    </div>`;
+  });
+  if(!anyResults) html = `<p style="color:var(--mist-dim);text-align:center;padding:30px 10px;">No questions match "${term}". Try another word.</p>`;
+  el.innerHTML = html;
+}
+
+function resetProgress(){
+  if(!confirm('Reset all progress and XP?')) return;
+  state = { xp:0, streak:0, bestStreak:0, hearts:5, levelProgress:{} };
+  LEVELS.forEach(l=>state.levelProgress[l.id]={complete:false, stars:0});
+  renderStats(); renderPath();
+  showToast('Progress reset!');
+}
+
+/* =========================================================
+   PRACTICE TEST
+========================================================= */
+let testState = null;
+let testTimerId = null;
+
+function renderTestHome(){
+  document.getElementById('testArea').innerHTML = `
+    <div class="test-mode-card" onclick="startTest('quick')">
+      <div class="tm-top"><div class="tm-icon">⚡</div><div class="tm-title">Quick Test</div></div>
+      <p class="tm-desc">10 rapid-fire questions — MCQ, True/False and Fill-in-the-blank, drawn from all 6 topics.</p>
+      <div class="tm-meta"><span class="pill">⏱ 6 minutes</span><span class="pill">10 Qs</span></div>
+    </div>
+    <div class="test-mode-card" onclick="startTest('full')">
+      <div class="tm-top"><div class="tm-icon">📝</div><div class="tm-title">Full Exam Paper</div></div>
+      <p class="tm-desc">A complete mock test like the real "What I Have Learnt" exercise — objective questions plus written short &amp; long answers that you grade yourself against the model answer.</p>
+      <div class="tm-meta"><span class="pill">⏱ 15 minutes</span><span class="pill">15 objective + 4 written</span></div>
+    </div>
+    <div class="panel">
+      <h2>💡 Why practice tests help</h2>
+      <p>Writing your own answers — not just picking options — is how real exams work. After each written question, you'll compare your answer to the textbook's model answer and mark yourself honestly. That's exactly how top students revise!</p>
+    </div>
+  `;
+}
+
+function startTest(mode){
+  const autoCount = mode==='quick' ? 10 : 15;
+  const writtenCount = mode==='quick' ? 0 : 4;
+  const seconds = mode==='quick' ? 360 : 900;
+
+  const autoQs = shuffle([...ALL_AUTO_QUESTIONS]).slice(0, autoCount).map(q=>({...q, kind:'auto'}));
+  const writtenQs = shuffle([...SELF_GRADE_QUESTIONS]).slice(0, writtenCount).map(q=>({...q, kind:'written'}));
+  const allQs = shuffle([...autoQs, ...writtenQs]);
+
+  testState = {
+    mode, qIndex:0, answered:false, secondsLeft:seconds,
+    questions: allQs,
+    results: [], // {correct:bool, q, type}
+  };
+  runTestTimer();
+  renderTestQuestion();
+}
+
+function runTestTimer(){
+  clearInterval(testTimerId);
+  testTimerId = setInterval(()=>{
+    if(!testState) { clearInterval(testTimerId); return; }
+    testState.secondsLeft--;
+    updateTimerDisplay();
+    if(testState.secondsLeft <= 0){
+      clearInterval(testTimerId);
+      finishTest();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay(){
+  const el = document.getElementById('testClock');
+  if(!el || !testState) return;
+  const m = Math.floor(testState.secondsLeft/60);
+  const s = testState.secondsLeft%60;
+  el.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+  el.classList.toggle('low', testState.secondsLeft <= 30);
+}
+
+function renderTestQuestion(){
+  if(!testState) return;
+  const idx = testState.qIndex;
+  if(idx >= testState.questions.length){ finishTest(); return; }
+  const q = testState.questions[idx];
+  testState.answered = false;
+
+  const header = `
+    <div class="timer-bar-wrap">
+      <div class="timer-pill">
+        <span class="tclock" id="testClock">--:--</span>
+        <span class="tq-count">Question ${idx+1} of ${testState.questions.length}</span>
+      </div>
+    </div>
+  `;
+
+  let bodyHtml = '';
+  if(q.kind === 'written'){
+    bodyHtml = `
+      <div class="q-type-tag">${SELF_GRADE_QUESTIONS.includes(q) ? 'WRITTEN ANSWER' : 'WRITTEN ANSWER'}</div>
+      <div class="q-text">${q.q}</div>
+      <textarea class="self-grade-textarea" id="writtenInput" placeholder="Type your answer here, in your own words..."></textarea>
+      <button class="btn btn-teal" onclick="revealModelAnswer()">Show Model Answer</button>
+      <div id="modelAnswerArea"></div>
+    `;
+  } else {
+    let tag = q.type==='mcq' ? 'MULTIPLE CHOICE' : q.type==='tf' ? 'TRUE OR FALSE' : 'FILL IN THE BLANK';
+    let opts = '';
+    if(q.type==='mcq'){
+      opts = q.options.map((opt,i)=>`<button class="opt" data-i="${i}" onclick="testAnswerMcq(${i})">${opt}</button>`).join('');
+    } else if(q.type==='tf'){
+      opts = `<button class="opt" data-i="1" onclick="testAnswerTf(true)">True</button><button class="opt" data-i="0" onclick="testAnswerTf(false)">False</button>`;
+    } else if(q.type==='fill'){
+      opts = `<input type="text" class="fill-input" id="testFillInput" placeholder="Type your answer..." autocomplete="off">
+              <button class="btn btn-teal" onclick="testAnswerFill()">Check Answer</button>`;
+    }
+    bodyHtml = `
+      <div class="q-type-tag">${tag}</div>
+      <div class="q-text">${q.q}</div>
+      <div id="testQuizBody">${opts}</div>
+      <div id="testFeedback"></div>
+    `;
+  }
+
+  document.getElementById('testArea').innerHTML = header + bodyHtml;
+  updateTimerDisplay();
+  if(q.type==='fill' && q.kind!=='written'){
+    setTimeout(()=>{ const el=document.getElementById('testFillInput'); if(el) el.focus(); }, 80);
+  }
+}
+
+function testAnswerMcq(i){
+  if(testState.answered) return;
+  testState.answered = true;
+  const q = testState.questions[testState.qIndex];
+  const correct = i === q.answer;
+  document.querySelectorAll('#testQuizBody .opt').forEach((b,bi)=>{
+    if(bi===q.answer) b.classList.add('correct');
+    else if(bi===i) b.classList.add('wrong');
+    else b.classList.add('dim');
+    b.style.pointerEvents='none';
+  });
+  testHandleResult(correct, q.explain);
+}
+function testAnswerTf(val){
+  if(testState.answered) return;
+  testState.answered = true;
+  const q = testState.questions[testState.qIndex];
+  const correct = val === q.answer;
+  document.querySelectorAll('#testQuizBody .opt').forEach(b=>{
+    const bi = b.getAttribute('data-i')==='1';
+    if(bi===q.answer) b.classList.add('correct');
+    else if(bi===val) b.classList.add('wrong');
+    else b.classList.add('dim');
+    b.style.pointerEvents='none';
+  });
+  testHandleResult(correct, q.explain);
+}
+function testAnswerFill(){
+  if(testState.answered) return;
+  const input = document.getElementById('testFillInput');
+  const val = (input.value||'').trim().toLowerCase();
+  if(!val){ input.focus(); return; }
+  testState.answered = true;
+  const q = testState.questions[testState.qIndex];
+  const correct = val === q.answer.toLowerCase() || val.includes(q.answer.toLowerCase());
+  input.disabled = true;
+  input.style.borderColor = correct ? 'var(--good)' : 'var(--bad)';
+  document.querySelector('#testQuizBody button').style.display = 'none';
+  testHandleResult(correct, q.explain, q.answer);
+}
+function testHandleResult(correct, explain, correctAnswer){
+  const q = testState.questions[testState.qIndex];
+  testState.results.push({correct, q: q.q, type:'auto'});
+  if(correct){ state.xp += 8; } 
+  renderStats();
+  const fb = document.getElementById('testFeedback');
+  fb.innerHTML = `
+    <div class="feedback-box ${correct?'good':'bad'}">
+      <b>${correct? '✓ Correct!' : (correctAnswer? '✗ The answer was "'+correctAnswer+'".' : '✗ Not quite.')}</b><br>${explain}
+    </div>
+    <button class="btn ${correct?'btn-teal':'btn-primary'}" onclick="testNext()">${testState.qIndex+1 < testState.questions.length ? 'Next Question →' : 'Finish Test 🎉'}</button>
+  `;
+}
+
+function revealModelAnswer(){
+  const q = testState.questions[testState.qIndex];
+  document.querySelector('#modelAnswerArea').innerHTML = `
+    <div class="model-answer-box"><b>MODEL ANSWER</b>${q.a}</div>
+    <p style="font-size:12.5px;color:var(--mist-dim);margin:0 0 10px;">Compare it with what you wrote. Be honest — how did you do?</p>
+    <div class="self-grade-btns">
+      <button class="btn btn-teal" onclick="testSelfGrade(true)">✓ I got it right</button>
+      <button class="btn btn-ghost" onclick="testSelfGrade(false)">Needs practice</button>
+    </div>
+  `;
+}
+function testSelfGrade(correct){
+  const q = testState.questions[testState.qIndex];
+  testState.results.push({correct, q: q.q, type:'written'});
+  if(correct) state.xp += 15;
+  renderStats();
+  testNext();
+}
+
+function testNext(){
+  testState.qIndex++;
+  renderTestQuestion();
+}
+
+function finishTest(){
+  clearInterval(testTimerId);
+  if(!testState) return;
+  const total = testState.results.length;
+  const correct = testState.results.filter(r=>r.correct).length;
+  const pct = total>0 ? correct/total : 0;
+  const emoji = pct>=0.9?'🌟':pct>=0.7?'🎉':pct>=0.4?'👍':'☁️';
+  const msg = pct>=0.9?"Outstanding! You'd ace the real exam!":
+              pct>=0.7?'Great job — solid understanding of the chapter.':
+              pct>=0.4?'Good attempt! Revisit a few topics in Journey or Explore.':
+              "Keep practising — try the Journey levels again first.";
+
+  const wrongList = testState.results.filter(r=>!r.correct);
+  const bonusXp = pct>=0.9 ? 40 : pct>=0.7 ? 20 : 0;
+  state.xp += bonusXp;
+  renderStats();
+
+  document.getElementById('testArea').innerHTML = `
+    <div class="result-center">
+      <div class="result-emoji">${emoji}</div>
+      <div class="result-title">Test Complete!</div>
+      <div class="result-sub">${msg}</div>
+      <div class="result-stats">
+        <div class="result-stat"><b>${correct}/${total}</b><span>Correct</span></div>
+        <div class="result-stat"><b>${Math.round(pct*100)}%</b><span>Score</span></div>
+        <div class="result-stat"><b>+${bonusXp}</b><span>Bonus XP</span></div>
+      </div>
+    </div>
+    ${wrongList.length ? `
+      <div class="section-title" style="font-size:15px;margin-bottom:8px;">📌 Review these</div>
+      ${wrongList.map(r=>`<div class="test-result-row"><div class="tr-icon">🔁</div><div class="tr-q">${r.q}</div></div>`).join('')}
+    ` : `<p style="text-align:center;color:var(--mist-dim);font-size:13px;">Perfect run — nothing to review! 🎉</p>`}
+    <button class="btn btn-primary" style="margin-top:14px;" onclick="testState=null; renderTestHome();">Back to Test Menu</button>
+  `;
+  testState = null;
+}
+
+/* =========================================================
+   INIT
+========================================================= */
+renderStats();
+renderPath();
+renderExplore();
+renderFlash();
+renderVault();
+renderTestHome();
+</script>
+</body>
+</html>
