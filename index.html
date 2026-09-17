@@ -97,11 +97,11 @@ body{
 }
 .tab-btn{
   flex:1;border:none;background:none;color:var(--mist-dim);
-  font-family:var(--font-body);font-weight:700;font-size:10.5px;
+  font-family:var(--font-body);font-weight:700;font-size:9.5px;
   display:flex;flex-direction:column;align-items:center;gap:3px;
-  padding:9px 2px 10px;cursor:pointer;transition:color .15s;
+  padding:9px 1px 10px;cursor:pointer;transition:color .15s;
 }
-.tab-btn svg{width:21px;height:21px;}
+.tab-btn svg{width:20px;height:20px;}
 .tab-btn.active{color:var(--sun);}
 .tab-btn.active svg{filter:drop-shadow(0 0 6px rgba(255,177,61,0.5));}
 
@@ -357,6 +357,85 @@ body{
 .test-result-row .tr-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
 .test-result-row .tr-q{font-size:12.5px;color:#DCE6F5;line-height:1.5;}
 .test-result-row .tr-q b{color:var(--mist);}
+
+/* ===== Interactive School Notes ===== */
+.notes-banner{
+  background:linear-gradient(135deg, rgba(47,191,174,0.16), rgba(47,191,174,0.04));
+  border:1px solid rgba(47,191,174,0.32);border-radius:16px;padding:14px 16px;margin-bottom:14px;
+}
+.notes-banner .nb-school{font-family:var(--font-head);font-size:13px;color:var(--teal);font-weight:800;letter-spacing:0.3px;}
+.notes-banner .nb-lesson{font-family:var(--font-head);font-size:16px;color:var(--mist);margin-top:2px;}
+.notes-banner .nb-meta{font-size:11px;color:var(--mist-dim);margin-top:3px;}
+.mastery-bar{height:8px;border-radius:6px;background:rgba(255,255,255,0.1);overflow:hidden;margin-top:11px;}
+.mastery-bar div{height:100%;background:linear-gradient(90deg, var(--teal), var(--good));border-radius:6px;transition:width .4s;}
+.mastery-label{display:flex;justify-content:space-between;font-size:11px;color:var(--mist-dim);font-weight:700;margin-top:6px;}
+
+.notes-group-title{
+  font-family:var(--font-head);font-size:14px;color:var(--sun);
+  display:flex;align-items:center;gap:7px;margin:18px 0 9px 2px;
+}
+.notes-group-title .dot{width:7px;height:7px;border-radius:50%;background:var(--sun);}
+
+.note-card{
+  background:linear-gradient(160deg, rgba(37,64,107,0.85), rgba(30,51,88,0.85));
+  border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:15px;margin-bottom:11px;
+  transition:border-color .2s;
+}
+.note-card.mastered{border-color:rgba(60,203,127,0.45);}
+.note-card.review{border-color:rgba(255,177,61,0.45);}
+.note-q{font-size:14px;font-weight:700;color:var(--mist);line-height:1.5;display:flex;gap:8px;}
+.note-q .qnum{color:var(--sun);font-family:var(--font-head);flex-shrink:0;}
+.note-status{
+  display:inline-block;font-size:10px;font-weight:800;padding:3px 9px;border-radius:999px;
+  margin-top:9px;letter-spacing:0.3px;
+}
+.note-status.ns-mastered{background:rgba(60,203,127,0.18);color:#9AF0C0;}
+.note-status.ns-review{background:rgba(255,177,61,0.18);color:#FFD9A0;}
+.note-status.ns-new{background:rgba(255,255,255,0.09);color:var(--mist-dim);}
+
+.recall-prompt{
+  font-size:12px;color:var(--mist-dim);font-style:italic;margin:11px 0 10px;
+  padding-left:10px;border-left:2px solid rgba(255,255,255,0.15);line-height:1.5;
+}
+.note-reveal-btn{
+  width:100%;background:rgba(255,255,255,0.08);border:1px dashed rgba(255,255,255,0.25);
+  color:var(--mist);border-radius:11px;padding:11px;font-family:var(--font-head);
+  font-weight:700;font-size:13.5px;cursor:pointer;
+}
+.note-reveal-btn:active{transform:scale(0.98);}
+
+.note-answer{margin-top:12px;}
+.point-row{
+  display:flex;gap:10px;align-items:flex-start;
+  background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);
+  border-radius:11px;padding:11px 12px;margin-bottom:7px;cursor:pointer;transition:all .15s;
+}
+.point-row:active{transform:scale(0.99);}
+.point-row.checked{background:rgba(60,203,127,0.13);border-color:rgba(60,203,127,0.35);}
+.point-check{
+  width:19px;height:19px;border-radius:6px;border:2px solid rgba(255,255,255,0.3);
+  flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;
+  font-size:12px;color:transparent;transition:all .15s;
+}
+.point-row.checked .point-check{background:var(--good);border-color:var(--good);color:#04331C;}
+.point-text{font-size:13px;line-height:1.55;color:#DCE6F5;}
+.point-text .kw{color:var(--sun);font-weight:700;}
+
+.note-grade-row{display:flex;gap:9px;margin-top:11px;}
+.note-grade-row button{
+  flex:1;border:none;border-radius:11px;padding:10px;font-family:var(--font-head);
+  font-weight:700;font-size:12.5px;cursor:pointer;
+}
+.ng-got{background:linear-gradient(135deg,#3ED1BE,var(--teal));color:#023A34;}
+.ng-review{background:rgba(255,177,61,0.2);color:#FFD9A0;border:1px solid rgba(255,177,61,0.4)!important;}
+
+.notes-toolbar{display:flex;gap:8px;margin-bottom:14px;}
+.notes-toolbar button{
+  flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);
+  color:var(--mist);border-radius:11px;padding:9px 6px;font-size:11.5px;font-weight:700;
+  cursor:pointer;font-family:var(--font-body);
+}
+.notes-toolbar button.active{background:rgba(47,191,174,0.2);border-color:var(--teal);color:#9FE3D8;}
 </style>
 </head>
 <body>
@@ -420,6 +499,12 @@ body{
   </div>
 
   <!-- ===================== PRACTICE TEST ===================== -->
+  <div class="screen" id="screen-notes">
+    <div class="section-title">School Notes</div>
+    <div class="section-desc">Your NPPS Lesson 7 notes — but interactive. Try to recall each answer first, then check yourself point by point.</div>
+    <div id="notesArea"></div>
+  </div>
+
   <div class="screen" id="screen-test">
     <div class="section-title">Practice Test</div>
     <div class="section-desc">A timed mock exam, just like school — mixed questions plus written answers you grade yourself.</div>
@@ -442,6 +527,10 @@ body{
     <button class="tab-btn" data-tab="vault" onclick="switchTab('vault')">
       <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Q&amp;A
+    </button>
+    <button class="tab-btn" data-tab="notes" onclick="switchTab('notes')">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 3v6h6" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      Notes
     </button>
     <button class="tab-btn" data-tab="test" onclick="switchTab('test')">
       <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -716,7 +805,133 @@ const VAULT = [
 const ALL_AUTO_QUESTIONS = LEVELS.flatMap(l => l.quiz);
 
 // Short & Long answer questions (self-graded, straight from the textbook) for the Practice Test
-const SELF_GRADE_QUESTIONS = [
+// ===== NPPS School Notes (Lesson 7), broken into checkable key points =====
+const SCHOOL_NOTES = [
+{
+  group:"Short Answer Questions",
+  items:[
+    {
+      q:"Define revolution and rotation.",
+      hint:"Two words: one is Earth going AROUND the Sun, one is Earth spinning in PLACE. Which is which?",
+      points:[
+        "<b>Revolution</b> is the movement of the Earth <span class='kw'>around the Sun</span> in its own orbit.",
+        "<b>Rotation</b> is the spinning of the Earth <span class='kw'>on its own axis</span>."
+      ]
+    },
+    {
+      q:"What is the difference between a storm and a thunderstorm?",
+      hint:"Start with what a storm is, then say what gets ADDED to make it a thunderstorm.",
+      points:[
+        "A very strong wind which can cause <span class='kw'>damage and destruction</span> is called a <b>storm</b>.",
+        "When a storm is accompanied with <span class='kw'>thunder and rain</span>, it is called a <b>thunderstorm</b>."
+      ]
+    },
+    {
+      q:"What is land breeze?",
+      hint:"Which direction does it move, and at what time of day?",
+      points:[
+        "Land breeze is the <span class='kw'>cool air from land</span> that moves <span class='kw'>towards the sea</span>, <b>at night</b>."
+      ]
+    },
+    {
+      q:"What is the difference between mist and fog?",
+      hint:"Define fog fully first — then mist in just a few words.",
+      points:[
+        "<b>Fog</b> refers to the suspended (tiny) <span class='kw'>water droplets or ice crystals</span> in the layer of air, next to the Earth's surface.",
+        "<b>Mist</b> is a <span class='kw'>mild form of fog</span>."
+      ]
+    },
+    {
+      q:"What is chlorination?",
+      hint:"Which chemical is added, and why?",
+      points:[
+        "Chlorination is the process of addition of <span class='kw'>chlorine</span> to impure water <span class='kw'>to purify it</span>."
+      ]
+    },
+  ]
+},
+{
+  group:"Long Answer Questions",
+  items:[
+    {
+      q:"What does the Sun help in creating sea breeze and land breeze?",
+      hint:"Two paragraphs: DAY first (sea breeze), then NIGHT (land breeze). In each, say which heats/cools faster, which air rises, and which air moves in.",
+      points:[
+        "<b>1)</b> During the <span class='kw'>day</span>, due to heat from the Sun, the <span class='kw'>land gets warmer faster</span> than water. The air on the land too gets warm and <span class='kw'>rises up</span>.",
+        "The cool air <span class='kw'>from the sea moves in towards the land</span> and takes its place. This is called <b>sea breeze</b>.",
+        "<b>2)</b> At <span class='kw'>night</span>, in absence of heat from the Sun, the <span class='kw'>land gets cooler faster</span> than water. The air above the sea becomes warm and <span class='kw'>rises up</span>.",
+        "The cool air <span class='kw'>from the land moves in towards the sea</span> and takes its place. This is called <b>land breeze</b>."
+      ]
+    },
+    {
+      q:"What are the factors that affect the rate of evaporation?",
+      hint:"There are FOUR factors. Try to name all four before revealing — each one has a 'the more/the faster' pattern.",
+      points:[
+        "<b>(a) Temperature:</b> The <span class='kw'>higher</span> the temperature, the faster is the rate of evaporation.",
+        "<b>(b) Wind:</b> Wind <span class='kw'>speeds up</span> the rate of evaporation.",
+        "<b>(c) Area of water exposed:</b> The <span class='kw'>larger</span> the area of water exposed, the larger will be the rate of evaporation.",
+        "<b>(d) Dry air:</b> The <span class='kw'>drier</span> the air, the faster the rate of evaporation."
+      ]
+    },
+    {
+      q:"Explain water cycle.",
+      hint:"Four numbered steps. Remember the order: evaporates → condenses & falls → collects → name the cycle. (Diagram: book page 271)",
+      points:[
+        "<b>1)</b> Water <span class='kw'>evaporates</span> from oceans, rivers, lakes and other water bodies.",
+        "<b>2)</b> It <span class='kw'>condenses to form clouds</span> and falls back on the ground in the form of <span class='kw'>rain, snow, hail and sleet</span>.",
+        "<b>3)</b> This water gets collected in rivers, ponds, lakes and oceans. Some of this water also seeps in through the ground making <span class='kw'>groundwater</span>. This is known as <b>collection</b>.",
+        "<b>4)</b> This entire cycle of change in the form of water is known as <b>water cycle</b>."
+      ]
+    },
+    {
+      q:"How can we remove insoluble impurities from water? Explain.",
+      hint:"Name the method first, then explain its two steps in order — what settles, then what you pour.",
+      points:[
+        "<b>1)</b> The method of <span class='kw'>sedimentation and decantation</span> can be used to remove insoluble impurities.",
+        "<b>2)</b> First let the impure water <span class='kw'>stand for some time</span>. Larger particles of impurities will <span class='kw'>settle down at the bottom</span>, leaving clear water on the top. This is known as <b>sedimentation</b>.",
+        "<b>3)</b> Now, carefully <span class='kw'>pour the clean water into another vessel</span>. This is known as <b>decantation</b>."
+      ]
+    },
+    {
+      q:"Explain the difference between filtration and boiling.",
+      hint:"Two numbered points — one for each method. Include the sand-and-water example, and the 5-minute rule.",
+      points:[
+        "<b>1)</b> In <b>filtration</b>, unclean water is passed through a <span class='kw'>filter paper</span>. The impurities get stuck on the filter paper, while clean water passes through it. For example, an impure mixture of <span class='kw'>sand and water</span> can be filtered using this method.",
+        "<b>2)</b> <b>Boiling</b> is the simplest method to purify water. Water should be boiled for at least <span class='kw'>five minutes</span> continuously. We should always keep boiled water <span class='kw'>covered</span>."
+      ]
+    },
+  ]
+}
+];
+
+// MCQ versions of the NPPS school-notes questions — tickable, for the Full Exam Paper
+const NOTES_MCQ = [
+  {type:'mcq', q:"Revolution is the movement of the Earth around the Sun in its own ____.", options:['axis','orbit','breeze','atmosphere'], answer:1, explain:"Revolution = the Earth moving around the Sun in its own orbit. Rotation = spinning on its own axis."},
+  {type:'mcq', q:"Rotation is the spinning of the Earth on its own ____.", options:['orbit','cycle','axis','surface'], answer:2, explain:"Rotation is the Earth spinning on its own axis, which causes day and night."},
+  {type:'mcq', q:"A very strong wind which can cause damage and destruction is called a ____.", options:['breeze','storm','mist','cyclone cloud'], answer:1, explain:"That is a storm. When thunder and rain join it, it becomes a thunderstorm."},
+  {type:'mcq', q:"Land breeze is the cool air from land that moves towards the sea, at what time?", options:['During the day','At night','Early morning only','All day long'], answer:1, explain:"At night the land cools faster, so cool land air moves out towards the sea."},
+  {type:'mcq', q:"Which statement correctly describes mist?", options:['Mist is a mild form of fog','Mist is heavier than fog','Mist forms only in summer','Mist is frozen rain'], answer:0, explain:"Fog is suspended tiny water droplets or ice crystals next to the Earth's surface; mist is a mild form of fog."},
+  {type:'mcq', q:"Chlorination is the process of adding ____ to impure water to purify it.", options:['chlorine','chalk','charcoal','alum'], answer:0, explain:"Chlorine is added to impure water to kill germs — this is chlorination."},
+  {type:'mcq', q:"During the day, the cool air from the sea moves in towards the land and takes its place. This is called ____.", options:['land breeze','sea breeze','thunderstorm','monsoon'], answer:1, explain:"By day the land warms faster, warm land air rises, and cool sea air moves in — that is sea breeze."},
+  {type:'mcq', q:"Which of these is NOT one of the four factors affecting the rate of evaporation?", options:['Temperature','Wind','Area of water exposed','Colour of the water'], answer:3, explain:"The four factors are temperature, wind, area of water exposed and dry air. Colour has nothing to do with it."},
+  {type:'mcq', q:"The larger the area of water exposed, the ____ the rate of evaporation.", options:['slower','larger','same as before','lower'], answer:1, explain:"A larger exposed surface lets more water escape as vapour, so evaporation is faster."},
+  {type:'mcq', q:"In the water cycle, water seeping through the ground to make groundwater is part of which step?", options:['Evaporation','Condensation','Collection','Precipitation'], answer:2, explain:"Water gathering in rivers, ponds, lakes, oceans and as groundwater is called collection."},
+  {type:'mcq', q:"In the water cycle, water vapour condenses to form ____.", options:['clouds','groundwater','frost only','wind'], answer:0, explain:"Water vapour rises and condenses to form clouds, which later fall as rain, snow, hail or sleet."},
+  {type:'mcq', q:"Which method is used to remove insoluble impurities from water?", options:['Chlorination','Sedimentation and decantation','Adding sugar','Reverse evaporation'], answer:1, explain:"Let the water stand so impurities settle (sedimentation), then pour off the clean water (decantation)."},
+  {type:'mcq', q:"Carefully pouring the clean water into another vessel is known as ____.", options:['sedimentation','filtration','decantation','boiling'], answer:2, explain:"Decantation is pouring off the clear water after the impurities have settled."},
+  {type:'mcq', q:"For at least how long should water be boiled continuously to purify it?", options:['One minute','Five minutes','Thirty seconds','One hour'], answer:1, explain:"Water should be boiled for at least five minutes continuously, and then kept covered."},
+  {type:'mcq', q:"In filtration, what happens to the impurities?", options:['They dissolve into the water','They get stuck on the filter paper','They evaporate away','They sink to the bottom of the funnel'], answer:1, explain:"Impurities get stuck on the filter paper while the clean water passes through it."},
+];
+
+// Written questions for the Practice Test — uses the exact NPPS school-notes wording
+const SELF_GRADE_QUESTIONS = SCHOOL_NOTES.flatMap(g =>
+  g.items.map(it => ({
+    q: it.q,
+    a: it.points.join('<br><br>')
+  }))
+);
+
+const OLD_SELF_GRADE_UNUSED = [
   ...VAULT.find(s=>s.section==="Short Answer Questions").items,
   ...VAULT.find(s=>s.section==="Long Answer Questions").items,
 ];
@@ -1178,29 +1393,36 @@ function renderTestHome(){
     </div>
     <div class="test-mode-card" onclick="startTest('full')">
       <div class="tm-top"><div class="tm-icon">📝</div><div class="tm-title">Full Exam Paper</div></div>
-      <p class="tm-desc">A complete mock test like the real "What I Have Learnt" exercise — objective questions plus written short &amp; long answers that you grade yourself against the model answer.</p>
-      <div class="tm-meta"><span class="pill">⏱ 15 minutes</span><span class="pill">15 objective + 4 written</span></div>
+      <p class="tm-desc">A complete mock test — 10 chapter questions plus 10 questions straight from your school notes. Every question is tick-the-answer, so it's quick and easy to attempt.</p>
+      <div class="tm-meta"><span class="pill">⏱ 15 minutes</span><span class="pill">20 Qs · all tickable</span></div>
     </div>
     <div class="panel">
-      <h2>💡 Why practice tests help</h2>
-      <p>Writing your own answers — not just picking options — is how real exams work. After each written question, you'll compare your answer to the textbook's model answer and mark yourself honestly. That's exactly how top students revise!</p>
+      <h2>💡 How to use this</h2>
+      <p>Try the <b>Quick Test</b> for a fast warm-up, then the <b>Full Exam Paper</b> the night before a test. Every question is multiple-choice, true/false or a short fill-in — just tick and go.</p>
+      <p style="margin-bottom:0;">At the end you'll get a score plus a <b>"Review these"</b> list of exactly which questions to go back over in the Notes or Journey tab.</p>
     </div>
   `;
 }
 
 function startTest(mode){
-  const autoCount = mode==='quick' ? 10 : 15;
-  const writtenCount = mode==='quick' ? 0 : 4;
-  const seconds = mode==='quick' ? 360 : 900;
+  let allQs;
+  let seconds;
 
-  const autoQs = shuffle([...ALL_AUTO_QUESTIONS]).slice(0, autoCount).map(q=>({...q, kind:'auto'}));
-  const writtenQs = shuffle([...SELF_GRADE_QUESTIONS]).slice(0, writtenCount).map(q=>({...q, kind:'written'}));
-  const allQs = shuffle([...autoQs, ...writtenQs]);
+  if(mode === 'quick'){
+    seconds = 360;
+    allQs = shuffle([...ALL_AUTO_QUESTIONS]).slice(0, 10).map(q=>({...q, kind:'auto'}));
+  } else {
+    seconds = 900;
+    // Full paper: 10 chapter questions + 10 school-notes MCQs — all tickable
+    const chapterQs = shuffle([...ALL_AUTO_QUESTIONS]).slice(0, 10);
+    const notesQs   = shuffle([...NOTES_MCQ]).slice(0, 10);
+    allQs = shuffle([...chapterQs, ...notesQs]).map(q=>({...q, kind:'auto'}));
+  }
 
   testState = {
     mode, qIndex:0, answered:false, secondsLeft:seconds,
     questions: allQs,
-    results: [], // {correct:bool, q, type}
+    results: [],
   };
   runTestTimer();
   renderTestQuestion();
@@ -1245,15 +1467,7 @@ function renderTestQuestion(){
   `;
 
   let bodyHtml = '';
-  if(q.kind === 'written'){
-    bodyHtml = `
-      <div class="q-type-tag">${SELF_GRADE_QUESTIONS.includes(q) ? 'WRITTEN ANSWER' : 'WRITTEN ANSWER'}</div>
-      <div class="q-text">${q.q}</div>
-      <textarea class="self-grade-textarea" id="writtenInput" placeholder="Type your answer here, in your own words..."></textarea>
-      <button class="btn btn-teal" onclick="revealModelAnswer()">Show Model Answer</button>
-      <div id="modelAnswerArea"></div>
-    `;
-  } else {
+  {
     let tag = q.type==='mcq' ? 'MULTIPLE CHOICE' : q.type==='tf' ? 'TRUE OR FALSE' : 'FILL IN THE BLANK';
     let opts = '';
     if(q.type==='mcq'){
@@ -1274,7 +1488,7 @@ function renderTestQuestion(){
 
   document.getElementById('testArea').innerHTML = header + bodyHtml;
   updateTimerDisplay();
-  if(q.type==='fill' && q.kind!=='written'){
+  if(q.type==='fill'){
     setTimeout(()=>{ const el=document.getElementById('testFillInput'); if(el) el.focus(); }, 80);
   }
 }
@@ -1395,6 +1609,126 @@ function finishTest(){
 }
 
 /* =========================================================
+   INTERACTIVE SCHOOL NOTES
+========================================================= */
+let notesState = {};   // key -> {revealed:bool, checked:Set-like obj, status:'new'|'mastered'|'review'}
+let notesFilter = 'all';
+
+SCHOOL_NOTES.forEach((g,gi)=>g.items.forEach((it,ii)=>{
+  notesState[gi+'-'+ii] = {revealed:false, checked:{}, status:'new'};
+}));
+
+function setNotesFilter(f){ notesFilter = f; renderNotes(); }
+
+function toggleReveal(key){
+  notesState[key].revealed = !notesState[key].revealed;
+  renderNotes();
+}
+function togglePoint(key, pi){
+  const st = notesState[key];
+  st.checked[pi] = !st.checked[pi];
+  renderNotes();
+}
+function gradeNote(key, mastered){
+  notesState[key].status = mastered ? 'mastered' : 'review';
+  if(mastered) { state.xp += 12; renderStats(); }
+  renderNotes();
+  showToast(mastered ? '✓ Marked as learnt! +12 XP' : '📌 Added to your review list');
+}
+function resetNotes(){
+  Object.keys(notesState).forEach(k=>{ notesState[k]={revealed:false, checked:{}, status:'new'}; });
+  renderNotes();
+  showToast('Notes practice reset');
+}
+
+function renderNotes(){
+  const total = Object.keys(notesState).length;
+  const mastered = Object.values(notesState).filter(s=>s.status==='mastered').length;
+  const reviewCount = Object.values(notesState).filter(s=>s.status==='review').length;
+  const pct = Math.round((mastered/total)*100);
+
+  let html = `
+    <div class="notes-banner">
+      <div class="nb-school">NEW PUNE PUBLIC SCHOOL</div>
+      <div class="nb-lesson">L-7 : Air, Water and Weather</div>
+      <div class="nb-meta">Grade IV · Science · Notes 2026-27 · Key Words: Page 273</div>
+      <div class="mastery-bar"><div style="width:${pct}%"></div></div>
+      <div class="mastery-label"><span>${mastered} of ${total} answers learnt</span><span>${pct}%</span></div>
+    </div>
+    <div class="notes-toolbar">
+      <button class="${notesFilter==='all'?'active':''}" onclick="setNotesFilter('all')">All (${total})</button>
+      <button class="${notesFilter==='review'?'active':''}" onclick="setNotesFilter('review')">To review (${reviewCount})</button>
+      <button class="${notesFilter==='new'?'active':''}" onclick="setNotesFilter('new')">Not done (${Object.values(notesState).filter(s=>s.status==='new').length})</button>
+      <button onclick="resetNotes()">↺</button>
+    </div>
+  `;
+
+  let shownAny = false;
+  SCHOOL_NOTES.forEach((group, gi)=>{
+    const visible = group.items.map((it,ii)=>({it,ii}))
+      .filter(({ii})=>{
+        const st = notesState[gi+'-'+ii];
+        if(notesFilter==='all') return true;
+        return st.status === notesFilter;
+      });
+    if(visible.length===0) return;
+    shownAny = true;
+    html += `<div class="notes-group-title"><span class="dot"></span>${group.group}</div>`;
+    visible.forEach(({it, ii})=>{
+      const key = gi+'-'+ii;
+      const st = notesState[key];
+      const statusLabel = st.status==='mastered' ? `<span class="note-status ns-mastered">✓ LEARNT</span>`
+                        : st.status==='review' ? `<span class="note-status ns-review">📌 NEEDS REVIEW</span>`
+                        : `<span class="note-status ns-new">NOT PRACTISED YET</span>`;
+
+      let inner = '';
+      if(!st.revealed){
+        inner = `
+          <div class="recall-prompt">💭 ${it.hint}</div>
+          <button class="note-reveal-btn" onclick="toggleReveal('${key}')">👀 Show the answer</button>
+        `;
+      } else {
+        const checkedCount = it.points.filter((_,pi)=>st.checked[pi]).length;
+        inner = `
+          <div class="note-answer">
+            <div style="font-size:11px;font-weight:800;color:var(--teal);letter-spacing:0.3px;margin-bottom:8px;">
+              TICK EACH POINT YOU REMEMBERED · ${checkedCount}/${it.points.length}
+            </div>
+            ${it.points.map((p,pi)=>`
+              <div class="point-row ${st.checked[pi]?'checked':''}" onclick="togglePoint('${key}',${pi})">
+                <div class="point-check">✓</div>
+                <div class="point-text">${p}</div>
+              </div>
+            `).join('')}
+            <div class="note-grade-row">
+              <button class="ng-got" onclick="gradeNote('${key}',true)">✓ I know this</button>
+              <button class="ng-review" onclick="gradeNote('${key}',false)">📌 Review later</button>
+            </div>
+            <button class="note-reveal-btn" style="margin-top:9px;" onclick="toggleReveal('${key}')">🙈 Hide answer &amp; try again</button>
+          </div>
+        `;
+      }
+
+      html += `
+        <div class="note-card ${st.status==='mastered'?'mastered':st.status==='review'?'review':''}">
+          <div class="note-q"><span class="qnum">Q${ii+1})</span><span>${it.q}</span></div>
+          ${statusLabel}
+          ${inner}
+        </div>
+      `;
+    });
+  });
+
+  if(!shownAny){
+    html += `<p style="text-align:center;color:var(--mist-dim);font-size:13.5px;padding:34px 12px;line-height:1.6;">
+      ${notesFilter==='review' ? '🎉 Nothing to review — great work!' : '🎉 All questions practised!'}
+    </p>`;
+  }
+
+  document.getElementById('notesArea').innerHTML = html;
+}
+
+/* =========================================================
    INIT
 ========================================================= */
 renderStats();
@@ -1402,6 +1736,7 @@ renderPath();
 renderExplore();
 renderFlash();
 renderVault();
+renderNotes();
 renderTestHome();
 </script>
 </body>
